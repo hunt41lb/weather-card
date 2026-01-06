@@ -234,6 +234,47 @@ export class WeatherCardEditor extends LitElement {
 
   public setConfig(config: WeatherCardConfig): void { this._config = config; }
 
+  private _getEntityAttributes(entityId: string | undefined): string[] {
+    if (!entityId || !this.hass?.states[entityId]) return [];
+    const entity = this.hass.states[entityId];
+    const attributes = Object.keys(entity.attributes || {});
+    // Filter out some internal/less useful attributes
+    const hiddenAttrs = ['friendly_name', 'icon', 'entity_picture', 'supported_features', 'attribution', 'device_class', 'state_class', 'unit_of_measurement'];
+    return attributes.filter(attr => !hiddenAttrs.includes(attr)).sort();
+  }
+
+  private _renderAttributeSelect(entityId: string | undefined, configValue: string, currentValue: string | undefined, placeholder: string) {
+    const attributes = this._getEntityAttributes(entityId);
+    
+    if (!entityId || attributes.length === 0) {
+      // Fallback to text field if no entity selected or no attributes
+      return html`
+        <ha-textfield 
+          .value=${currentValue || ''} 
+          .configValue=${configValue} 
+          @input=${this._valueChanged} 
+          placeholder=${placeholder}
+        ></ha-textfield>
+      `;
+    }
+
+    return html`
+      <ha-select
+        .value=${currentValue || ''}
+        .configValue=${configValue}
+        @selected=${this._valueChanged}
+        @closed=${(e: Event) => e.stopPropagation()}
+        fixedMenuPosition
+        naturalMenuWidth
+      >
+        <mwc-list-item value="">Use State (no attribute)</mwc-list-item>
+        ${attributes.map(attr => html`
+          <mwc-list-item .value=${attr}>${attr}</mwc-list-item>
+        `)}
+      </ha-select>
+    `;
+  }
+
   protected render() {
     if (!this.hass || !this._config) return html``;
     return html`
@@ -262,7 +303,7 @@ export class WeatherCardEditor extends LitElement {
           <div class="field-row">
             <div class="field">
               <span class="field-label">Attribute (optional)</span>
-              <ha-textfield .value=${this._config.primary_attribute || ''} .configValue=${'primary_attribute'} @input=${this._valueChanged} placeholder="temperature"></ha-textfield>
+              ${this._renderAttributeSelect(this._config.primary_entity, 'primary_attribute', this._config.primary_attribute, 'temperature')}
             </div>
             <div class="field">
               <span class="field-label">Unit</span>
@@ -279,7 +320,7 @@ export class WeatherCardEditor extends LitElement {
           <div class="field-row">
             <div class="field">
               <span class="field-label">Attribute (optional)</span>
-              <ha-textfield .value=${this._config.secondary_attribute || ''} .configValue=${'secondary_attribute'} @input=${this._valueChanged} placeholder="apparent_temperature"></ha-textfield>
+              ${this._renderAttributeSelect(this._config.secondary_entity, 'secondary_attribute', this._config.secondary_attribute, 'apparent_temperature')}
             </div>
             <div class="field">
               <span class="field-label">Unit</span>
@@ -299,7 +340,7 @@ export class WeatherCardEditor extends LitElement {
           </div>
           <div class="field">
             <span class="field-label">Attribute (optional)</span>
-            <ha-textfield .value=${this._config.description_attribute || ''} .configValue=${'description_attribute'} @input=${this._valueChanged} placeholder="desc"></ha-textfield>
+            ${this._renderAttributeSelect(this._config.description_entity, 'description_attribute', this._config.description_attribute, 'desc')}
           </div>
         </div>
         <div class="section">
