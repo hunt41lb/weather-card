@@ -42,8 +42,8 @@ export declare class WeatherCard extends LitElement {
     static getConfigElement(): HTMLElement;
     static getStubConfig(): WeatherCardConfig;
     protected render(): import("lit-html").TemplateResult<1>;
+    private _renderWeatherIcon;
     private _getGreeting;
-    private _getWeatherIcon;
     private _getPrimaryValue;
     private _getSecondaryValue;
     private _getDescription;

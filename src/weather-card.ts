@@ -1,6 +1,7 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { guard } from 'lit/directives/guard.js';
 
 interface WeatherCardConfig {
   type: string;
@@ -95,21 +96,33 @@ export class WeatherCard extends LitElement {
   static get styles() {
     return css`
       :host { display: block; }
-      ha-card { padding: 12px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; }
+      ha-card { padding: 12px; box-sizing: border-box; overflow: hidden; }
       .weather-card-grid {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr auto;
+        gap: 0px 0px;
+        grid-template-areas:
+          "greeting greeting greeting greeting"
+          "icon icon primary primary"
+          "icon icon secondary secondary"
+          "description description description description";
         height: 100%;
         min-height: 140px;
       }
-      .greeting { font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 8px; flex-shrink: 0; }
-      .main-content { display: flex; flex-direction: row; align-items: center; justify-content: center; flex: 1; }
-      .weather-icon { display: flex; align-items: center; justify-content: center; }
+      .weather-card-grid.no-greeting {
+        grid-template-rows: 1fr 1fr auto;
+        grid-template-areas:
+          "icon icon primary primary"
+          "icon icon secondary secondary"
+          "description description description description";
+      }
+      .greeting { grid-area: greeting; font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 4px; }
+      .weather-icon { grid-area: icon; display: flex; align-items: center; justify-content: center; }
       .weather-icon svg { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
-      .values-container { display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 8px; }
-      .primary-value { font-size: 40px; font-weight: 400; line-height: 1; }
-      .secondary-value { font-size: 12px; font-weight: 400; padding-top: 4px; opacity: 0.8; }
-      .description { font-size: 18px; font-weight: 600; text-align: center; padding-top: 8px; flex-shrink: 0; }
+      .primary-value { grid-area: primary; font-size: 40px; font-weight: 400; line-height: 1; display: flex; align-items: flex-end; justify-content: center; }
+      .secondary-value { grid-area: secondary; font-size: 12px; font-weight: 400; opacity: 0.8; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; }
+      .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 4px; }
       .unavailable { opacity: 0.5; font-style: italic; }
     `;
   }
@@ -128,26 +141,36 @@ export class WeatherCard extends LitElement {
   protected render() {
     if (!this._config || !this.hass) return html``;
     const greeting = this._getGreeting();
-    const icon = this._getWeatherIcon();
     const primary = this._getPrimaryValue();
     const secondary = this._getSecondaryValue();
     const description = this._getDescription();
     const showGreeting = this._config.show_greeting !== false;
+    
+    // Get weather condition and sun state for icon (used in guard)
+    const weatherEntity = this._config.weather_entity ? this.hass.states[this._config.weather_entity] : undefined;
+    const sunEntity = this._config.sun_entity ? this.hass.states[this._config.sun_entity] : undefined;
+    const condition = weatherEntity?.state || '';
+    const isDay = sunEntity?.state === 'above_horizon';
+    
     return html`
       <ha-card style="height: ${this._config.card_height}">
-        <div class="weather-card-grid" style="--weather-icon-size: ${this._config.icon_size}px">
+        <div class="weather-card-grid ${showGreeting ? '' : 'no-greeting'}" style="--weather-icon-size: ${this._config.icon_size}px">
           ${showGreeting ? html`<div class="greeting">${greeting}</div>` : nothing}
-          <div class="main-content">
-            <div class="weather-icon">${icon}</div>
-            <div class="values-container">
-              <div class="primary-value">${primary}</div>
-              <div class="secondary-value">${secondary}</div>
-            </div>
+          <div class="weather-icon">
+            ${guard([condition, isDay], () => this._renderWeatherIcon(condition, isDay))}
           </div>
+          <div class="primary-value">${primary}</div>
+          <div class="secondary-value">${secondary}</div>
           <div class="description">${description}</div>
         </div>
       </ha-card>
     `;
+  }
+
+  private _renderWeatherIcon(condition: string, isDay: boolean) {
+    if (!condition) return html`<span class="unavailable">No weather entity</span>`;
+    const svgContent = getWeatherIcon(condition, isDay);
+    return html`${unsafeHTML(svgContent)}`;
   }
 
   private _getGreeting(): string {
@@ -155,16 +178,6 @@ export class WeatherCard extends LitElement {
     const userName = this.hass?.user?.name;
     if (userName) return `Hello, ${userName.split(' ')[0]}`;
     return 'Hello';
-  }
-
-  private _getWeatherIcon() {
-    const weatherEntity = this._config.weather_entity ? this.hass.states[this._config.weather_entity] : undefined;
-    const sunEntity = this._config.sun_entity ? this.hass.states[this._config.sun_entity] : undefined;
-    if (!weatherEntity) return html`<span class="unavailable">No weather entity</span>`;
-    const condition = weatherEntity.state;
-    const isDay = sunEntity?.state === 'above_horizon';
-    const svgContent = getWeatherIcon(condition, isDay);
-    return html`${unsafeHTML(svgContent)}`;
   }
 
   private _getPrimaryValue(): string {
