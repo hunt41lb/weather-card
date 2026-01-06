@@ -25,8 +25,6 @@ interface HomeAssistant {
         name?: string;
     };
     callService: (domain: string, service: string, data: object) => void;
-    formatEntityState: (entity: HassEntity) => string;
-    formatEntityAttributeValue: (entity: HassEntity, attribute: string) => string;
 }
 interface HassEntity {
     entity_id: string;
@@ -34,8 +32,6 @@ interface HassEntity {
     attributes: {
         [key: string]: unknown;
     };
-    last_changed: string;
-    last_updated: string;
 }
 export declare class WeatherCard extends LitElement {
     hass: HomeAssistant;
