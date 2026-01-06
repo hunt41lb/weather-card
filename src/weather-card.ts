@@ -1,5 +1,6 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 interface WeatherCardConfig {
   type: string;
@@ -94,25 +95,21 @@ export class WeatherCard extends LitElement {
   static get styles() {
     return css`
       :host { display: block; }
-      ha-card { padding: 12px; box-sizing: border-box; overflow: hidden; }
+      ha-card { padding: 12px; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; }
       .weather-card-grid {
-        display: grid;
-        grid-template-areas: "greeting greeting" "icon values" "description description";
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto 1fr auto;
-        height: 100%; min-height: 140px; gap: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 140px;
       }
-      .weather-card-grid.no-greeting {
-        grid-template-areas: "icon values" "description description";
-        grid-template-rows: 1fr auto;
-      }
-      .greeting { grid-area: greeting; font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 4px; }
-      .weather-icon { grid-area: icon; display: flex; align-items: center; justify-content: center; }
+      .greeting { font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 8px; flex-shrink: 0; }
+      .main-content { display: flex; flex-direction: row; align-items: center; justify-content: center; flex: 1; }
+      .weather-icon { display: flex; align-items: center; justify-content: center; }
       .weather-icon svg { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
-      .values-container { grid-area: values; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-left: 8px; }
+      .values-container { display: flex; flex-direction: column; justify-content: center; align-items: center; padding-left: 8px; }
       .primary-value { font-size: 40px; font-weight: 400; line-height: 1; }
       .secondary-value { font-size: 12px; font-weight: 400; padding-top: 4px; opacity: 0.8; }
-      .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 8px; }
+      .description { font-size: 18px; font-weight: 600; text-align: center; padding-top: 8px; flex-shrink: 0; }
       .unavailable { opacity: 0.5; font-style: italic; }
     `;
   }
@@ -138,12 +135,14 @@ export class WeatherCard extends LitElement {
     const showGreeting = this._config.show_greeting !== false;
     return html`
       <ha-card style="height: ${this._config.card_height}">
-        <div class="weather-card-grid ${showGreeting ? '' : 'no-greeting'}" style="--weather-icon-size: ${this._config.icon_size}px">
+        <div class="weather-card-grid" style="--weather-icon-size: ${this._config.icon_size}px">
           ${showGreeting ? html`<div class="greeting">${greeting}</div>` : nothing}
-          <div class="weather-icon">${icon}</div>
-          <div class="values-container">
-            <div class="primary-value">${primary}</div>
-            <div class="secondary-value">${secondary}</div>
+          <div class="main-content">
+            <div class="weather-icon">${icon}</div>
+            <div class="values-container">
+              <div class="primary-value">${primary}</div>
+              <div class="secondary-value">${secondary}</div>
+            </div>
           </div>
           <div class="description">${description}</div>
         </div>
@@ -165,9 +164,7 @@ export class WeatherCard extends LitElement {
     const condition = weatherEntity.state;
     const isDay = sunEntity?.state === 'above_horizon';
     const svgContent = getWeatherIcon(condition, isDay);
-    const template = document.createElement('template');
-    template.innerHTML = svgContent;
-    return html`${template.content.cloneNode(true)}`;
+    return html`${unsafeHTML(svgContent)}`;
   }
 
   private _getPrimaryValue(): string {
@@ -355,15 +352,32 @@ export class WeatherCardEditor extends LitElement {
     return html`
       <div class="editor-container">
         <div class="section">
-          <div class="section-title">Weather & Icon</div>
+          <div class="section-title">Weather Source</div>
           <div class="field">
-            <span class="field-label">Weather Entity (for icon)</span>
-            <ha-entity-picker .hass=${this.hass} .value=${this._config.weather_entity || ''} .configValue=${'weather_entity'} .includeDomains=${['weather']} @value-changed=${this._valueChanged} allow-custom-entity></ha-entity-picker>
+            <span class="field-label">Weather Entity (required - provides icon &amp; conditions)</span>
+            <ha-entity-picker 
+              .hass=${this.hass} 
+              .value=${this._config.weather_entity || ''} 
+              .configValue=${'weather_entity'} 
+              @value-changed=${this._valueChanged}
+              .entityFilter=${(entity: { entity_id: string }) => entity.entity_id.startsWith('weather.')}
+              allow-custom-entity
+            ></ha-entity-picker>
           </div>
           <div class="field">
-            <span class="field-label">Sun Entity (for day/night icons)</span>
-            <ha-entity-picker .hass=${this.hass} .value=${this._config.sun_entity || 'sun.sun'} .configValue=${'sun_entity'} .includeDomains=${['sun']} @value-changed=${this._valueChanged} allow-custom-entity></ha-entity-picker>
+            <span class="field-label">Sun Entity (for day/night icon variants)</span>
+            <ha-entity-picker 
+              .hass=${this.hass} 
+              .value=${this._config.sun_entity || 'sun.sun'} 
+              .configValue=${'sun_entity'} 
+              @value-changed=${this._valueChanged}
+              .entityFilter=${(entity: { entity_id: string }) => entity.entity_id.startsWith('sun.')}
+              allow-custom-entity
+            ></ha-entity-picker>
           </div>
+        </div>
+        <div class="section">
+          <div class="section-title">Icon Settings</div>
           <div class="field">
             <span class="field-label">Icon Size (px)</span>
             <ha-textfield type="number" .value=${String(this._config.icon_size || 100)} .configValue=${'icon_size'} @input=${this._valueChanged}></ha-textfield>
