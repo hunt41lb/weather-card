@@ -55,9 +55,11 @@ export declare class WeatherCardEditor extends LitElement {
     static get styles(): import("lit").CSSResult;
     setConfig(config: WeatherCardConfig): void;
     private _getEntityAttributes;
+    private _getAttributeUnit;
     private _renderAttributeSelect;
     protected render(): import("lit-html").TemplateResult<1>;
     private _valueChanged;
+    private _attributeChanged;
 }
 declare global {
     interface Window {

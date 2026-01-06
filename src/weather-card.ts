@@ -99,15 +99,15 @@ export class WeatherCard extends LitElement {
         display: grid;
         grid-template-areas: "greeting greeting greeting greeting" "icon icon primary primary" "icon icon secondary secondary" "description description description description";
         grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: auto 1fr 1fr auto;
-        height: 100%; min-height: 140px; gap: 4px;
+        grid-template-rows: auto 1fr auto auto;
+        height: 100%; min-height: 140px; gap: 0;
       }
       .greeting { grid-area: greeting; font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 4px; }
       .weather-icon { grid-area: icon; display: flex; align-items: center; justify-content: center; }
       .weather-icon svg { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
-      .primary-value { grid-area: primary; font-size: 40px; font-weight: 400; display: flex; align-items: flex-end; justify-content: flex-start; padding-left: 8px; }
-      .secondary-value { grid-area: secondary; font-size: 12px; font-weight: 400; display: flex; align-items: flex-start; justify-content: flex-start; padding-left: 8px; padding-top: 4px; opacity: 0.8; }
-      .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 4px; }
+      .primary-value { grid-area: primary; font-size: 40px; font-weight: 400; display: flex; align-items: flex-end; justify-content: flex-start; padding-left: 8px; line-height: 1; }
+      .secondary-value { grid-area: secondary; font-size: 12px; font-weight: 400; display: flex; align-items: flex-start; justify-content: flex-start; padding-left: 8px; padding-top: 2px; opacity: 0.8; }
+      .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 8px; }
       .unavailable { opacity: 0.5; font-style: italic; }
     `;
   }
@@ -243,7 +243,38 @@ export class WeatherCardEditor extends LitElement {
     return attributes.filter(attr => !hiddenAttrs.includes(attr)).sort();
   }
 
-  private _renderAttributeSelect(entityId: string | undefined, configValue: string, currentValue: string | undefined, placeholder: string) {
+  private _getAttributeUnit(entityId: string | undefined, attribute: string | undefined): string {
+    if (!entityId || !attribute || !this.hass?.states[entityId]) return '';
+    const entity = this.hass.states[entityId];
+    
+    // First check if the entity has a unit_of_measurement we can use
+    const entityUnit = String(entity.attributes.unit_of_measurement || '');
+    
+    // Common attribute-to-unit mappings for weather entities
+    const unitMappings: { [key: string]: string } = {
+      'temperature': entityUnit || '°F',
+      'apparent_temperature': entityUnit || '°F',
+      'dew_point': entityUnit || '°F',
+      'humidity': '%',
+      'pressure': 'hPa',
+      'wind_speed': 'mph',
+      'wind_gust_speed': 'mph',
+      'visibility': 'mi',
+      'precipitation': 'in',
+      'precipitation_probability': '%',
+      'cloud_coverage': '%',
+      'uv_index': '',
+    };
+
+    // Return mapped unit if available
+    if (unitMappings[attribute] !== undefined) {
+      return unitMappings[attribute];
+    }
+
+    return '';
+  }
+
+  private _renderAttributeSelect(entityId: string | undefined, configValue: string, currentValue: string | undefined, placeholder: string, unitConfigValue?: string) {
     const attributes = this._getEntityAttributes(entityId);
     
     if (!entityId || attributes.length === 0) {
@@ -262,7 +293,9 @@ export class WeatherCardEditor extends LitElement {
       <ha-select
         .value=${currentValue || ''}
         .configValue=${configValue}
-        @selected=${this._valueChanged}
+        .unitConfigValue=${unitConfigValue || ''}
+        .entityId=${entityId}
+        @selected=${this._attributeChanged}
         @closed=${(e: Event) => e.stopPropagation()}
         fixedMenuPosition
         naturalMenuWidth
@@ -303,11 +336,11 @@ export class WeatherCardEditor extends LitElement {
           <div class="field-row">
             <div class="field">
               <span class="field-label">Attribute (optional)</span>
-              ${this._renderAttributeSelect(this._config.primary_entity, 'primary_attribute', this._config.primary_attribute, 'temperature')}
+              ${this._renderAttributeSelect(this._config.primary_entity, 'primary_attribute', this._config.primary_attribute, 'temperature', 'primary_unit')}
             </div>
             <div class="field">
-              <span class="field-label">Unit</span>
-              <ha-textfield .value=${this._config.primary_unit || ''} .configValue=${'primary_unit'} @input=${this._valueChanged} placeholder="°F"></ha-textfield>
+              <span class="field-label">Unit (auto-filled, can override)</span>
+              <ha-textfield .value=${this._config.primary_unit ?? ''} .configValue=${'primary_unit'} @input=${this._valueChanged} placeholder="°F"></ha-textfield>
             </div>
           </div>
         </div>
@@ -320,11 +353,11 @@ export class WeatherCardEditor extends LitElement {
           <div class="field-row">
             <div class="field">
               <span class="field-label">Attribute (optional)</span>
-              ${this._renderAttributeSelect(this._config.secondary_entity, 'secondary_attribute', this._config.secondary_attribute, 'apparent_temperature')}
+              ${this._renderAttributeSelect(this._config.secondary_entity, 'secondary_attribute', this._config.secondary_attribute, 'apparent_temperature', 'secondary_unit')}
             </div>
             <div class="field">
-              <span class="field-label">Unit</span>
-              <ha-textfield .value=${this._config.secondary_unit || ''} .configValue=${'secondary_unit'} @input=${this._valueChanged} placeholder="°F"></ha-textfield>
+              <span class="field-label">Unit (auto-filled, can override)</span>
+              <ha-textfield .value=${this._config.secondary_unit ?? ''} .configValue=${'secondary_unit'} @input=${this._valueChanged} placeholder="°F"></ha-textfield>
             </div>
           </div>
           <div class="field">
@@ -377,6 +410,40 @@ export class WeatherCardEditor extends LitElement {
       delete (newConfig as Record<string, unknown>)[configValue];
       this._config = newConfig;
     } else { this._config = { ...this._config, [configValue]: value }; }
+    const event = new CustomEvent('config-changed', { detail: { config: this._config }, bubbles: true, composed: true });
+    this.dispatchEvent(event);
+  }
+
+  private _attributeChanged(ev: Event): void {
+    if (!this._config || !this.hass) return;
+    const target = ev.target as HTMLElement & { configValue: string; unitConfigValue: string; entityId: string; value: string };
+    const configValue = target.configValue;
+    const unitConfigValue = target.unitConfigValue;
+    const entityId = target.entityId;
+    const attribute = target.value;
+
+    if (!configValue) return;
+
+    // Build new config with the attribute change
+    const newConfig: Record<string, unknown> = { ...this._config };
+    
+    if (attribute === '' || attribute === undefined) {
+      delete newConfig[configValue];
+      // Also clear the unit when clearing attribute
+      if (unitConfigValue) {
+        delete newConfig[unitConfigValue];
+      }
+    } else {
+      newConfig[configValue] = attribute;
+      // Auto-fill unit if we have a unitConfigValue and it's not already set by user
+      if (unitConfigValue) {
+        const suggestedUnit = this._getAttributeUnit(entityId, attribute);
+        // Always update unit when attribute changes (user can override afterwards)
+        newConfig[unitConfigValue] = suggestedUnit;
+      }
+    }
+
+    this._config = newConfig as WeatherCardConfig;
     const event = new CustomEvent('config-changed', { detail: { config: this._config }, bubbles: true, composed: true });
     this.dispatchEvent(event);
   }
