@@ -20,6 +20,13 @@ interface WeatherCardConfig {
   greeting_name?: string;
   icon_size?: number;
   card_height?: string;
+  view_layout?: {
+    'grid-area'?: string;
+    'grid-column'?: string;
+    'grid-row'?: string;
+    position?: string;
+    [key: string]: unknown;
+  };
 }
 
 interface HomeAssistant {
@@ -133,6 +140,11 @@ export class WeatherCard extends LitElement {
   }
 
   public getCardSize(): number { return 3; }
+  
+  public getLayoutOptions() {
+    return this._config?.view_layout || {};
+  }
+  
   public static getConfigElement(): HTMLElement { return document.createElement('weather-card-editor'); }
   public static getStubConfig(): WeatherCardConfig {
     return { type: 'custom:weather-card', weather_entity: 'weather.forecast_home', sun_entity: 'sun.sun', primary_entity: 'weather.forecast_home', primary_attribute: 'temperature', primary_unit: '°F', secondary_entity: 'weather.forecast_home', secondary_attribute: 'apparent_temperature', secondary_unit: '°F', secondary_label: 'Feels Like:', description_entity: 'weather.forecast_home', show_greeting: true, icon_size: 100 };
@@ -461,8 +473,42 @@ export class WeatherCardEditor extends LitElement {
             <ha-textfield .value=${this._config.card_height || '180px'} .configValue=${'card_height'} @input=${this._valueChanged} placeholder="180px"></ha-textfield>
           </div>
         </div>
+        <div class="section">
+          <div class="section-title">Layout</div>
+          <div class="field">
+            <span class="field-label">Grid Area (for use with layout-card or grid layouts)</span>
+            <ha-textfield .value=${this._config.view_layout?.['grid-area'] || ''} .configValue=${'view_layout.grid-area'} @input=${this._viewLayoutChanged} placeholder="weather"></ha-textfield>
+          </div>
+        </div>
       </div>
     `;
+  }
+
+  private _viewLayoutChanged(ev: Event): void {
+    if (!this._config || !this.hass) return;
+    const target = ev.target as HTMLInputElement & { configValue: string };
+    const value = target.value;
+    
+    const newViewLayout = { ...this._config.view_layout };
+    if (value === '' || value === undefined) {
+      delete newViewLayout['grid-area'];
+    } else {
+      newViewLayout['grid-area'] = value;
+    }
+    
+    // Clean up empty view_layout
+    const hasValues = Object.keys(newViewLayout).length > 0;
+    
+    if (hasValues) {
+      this._config = { ...this._config, view_layout: newViewLayout };
+    } else {
+      const newConfig = { ...this._config };
+      delete newConfig.view_layout;
+      this._config = newConfig;
+    }
+    
+    const event = new CustomEvent('config-changed', { detail: { config: this._config }, bubbles: true, composed: true });
+    this.dispatchEvent(event);
   }
 
   private _valueChanged(ev: Event): void {

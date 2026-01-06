@@ -16,6 +16,13 @@ interface WeatherCardConfig {
     greeting_name?: string;
     icon_size?: number;
     card_height?: string;
+    view_layout?: {
+        'grid-area'?: string;
+        'grid-column'?: string;
+        'grid-row'?: string;
+        position?: string;
+        [key: string]: unknown;
+    };
 }
 interface HomeAssistant {
     states: {
@@ -39,6 +46,13 @@ export declare class WeatherCard extends LitElement {
     static get styles(): import("lit").CSSResult;
     setConfig(config: WeatherCardConfig): void;
     getCardSize(): number;
+    getLayoutOptions(): {
+        [key: string]: unknown;
+        'grid-area'?: string;
+        'grid-column'?: string;
+        'grid-row'?: string;
+        position?: string;
+    };
     static getConfigElement(): HTMLElement;
     static getStubConfig(): WeatherCardConfig;
     protected render(): import("lit-html").TemplateResult<1>;
@@ -59,6 +73,7 @@ export declare class WeatherCardEditor extends LitElement {
     private _getAttributeLabel;
     private _renderAttributeSelect;
     protected render(): import("lit-html").TemplateResult<1>;
+    private _viewLayoutChanged;
     private _valueChanged;
     private _attributeChanged;
 }
