@@ -97,16 +97,21 @@ export class WeatherCard extends LitElement {
       ha-card { padding: 12px; box-sizing: border-box; overflow: hidden; }
       .weather-card-grid {
         display: grid;
-        grid-template-areas: "greeting greeting greeting greeting" "icon icon primary primary" "icon icon secondary secondary" "description description description description";
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-        grid-template-rows: auto 1fr auto auto;
+        grid-template-areas: "greeting greeting" "icon values" "description description";
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr auto;
         height: 100%; min-height: 140px; gap: 0;
+      }
+      .weather-card-grid.no-greeting {
+        grid-template-areas: "icon values" "description description";
+        grid-template-rows: 1fr auto;
       }
       .greeting { grid-area: greeting; font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 4px; }
       .weather-icon { grid-area: icon; display: flex; align-items: center; justify-content: center; }
       .weather-icon svg { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
-      .primary-value { grid-area: primary; font-size: 40px; font-weight: 400; display: flex; align-items: flex-end; justify-content: flex-start; padding-left: 8px; line-height: 1; }
-      .secondary-value { grid-area: secondary; font-size: 12px; font-weight: 400; display: flex; align-items: flex-start; justify-content: flex-start; padding-left: 8px; padding-top: 2px; opacity: 0.8; }
+      .values-container { grid-area: values; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding-left: 8px; }
+      .primary-value { font-size: 40px; font-weight: 400; line-height: 1; }
+      .secondary-value { font-size: 12px; font-weight: 400; padding-top: 4px; opacity: 0.8; }
       .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 8px; }
       .unavailable { opacity: 0.5; font-style: italic; }
     `;
@@ -114,7 +119,7 @@ export class WeatherCard extends LitElement {
 
   public setConfig(config: WeatherCardConfig): void {
     if (!config) throw new Error('Invalid configuration');
-    this._config = { show_greeting: true, icon_size: 100, card_height: '180px', sun_entity: 'sun.sun', secondary_label: 'Feels Like:', ...config };
+    this._config = { show_greeting: true, icon_size: 100, card_height: '180px', sun_entity: 'sun.sun', ...config };
   }
 
   public getCardSize(): number { return 3; }
@@ -130,13 +135,16 @@ export class WeatherCard extends LitElement {
     const primary = this._getPrimaryValue();
     const secondary = this._getSecondaryValue();
     const description = this._getDescription();
+    const showGreeting = this._config.show_greeting !== false;
     return html`
       <ha-card style="height: ${this._config.card_height}">
-        <div class="weather-card-grid" style="--weather-icon-size: ${this._config.icon_size}px">
-          ${this._config.show_greeting ? html`<div class="greeting">${greeting}</div>` : nothing}
+        <div class="weather-card-grid ${showGreeting ? '' : 'no-greeting'}" style="--weather-icon-size: ${this._config.icon_size}px">
+          ${showGreeting ? html`<div class="greeting">${greeting}</div>` : nothing}
           <div class="weather-icon">${icon}</div>
-          <div class="primary-value">${primary}</div>
-          <div class="secondary-value">${secondary}</div>
+          <div class="values-container">
+            <div class="primary-value">${primary}</div>
+            <div class="secondary-value">${secondary}</div>
+          </div>
           <div class="description">${description}</div>
         </div>
       </ha-card>
@@ -274,7 +282,40 @@ export class WeatherCardEditor extends LitElement {
     return '';
   }
 
-  private _renderAttributeSelect(entityId: string | undefined, configValue: string, currentValue: string | undefined, placeholder: string, unitConfigValue?: string) {
+  private _getAttributeLabel(attribute: string | undefined): string {
+    if (!attribute) return '';
+    
+    // Common attribute-to-label mappings
+    const labelMappings: { [key: string]: string } = {
+      'temperature': 'Temperature:',
+      'apparent_temperature': 'Feels Like:',
+      'dew_point': 'Dew Point:',
+      'humidity': 'Humidity:',
+      'pressure': 'Pressure:',
+      'wind_speed': 'Wind:',
+      'wind_gust_speed': 'Gusts:',
+      'wind_bearing': 'Wind Direction:',
+      'visibility': 'Visibility:',
+      'precipitation': 'Precipitation:',
+      'precipitation_probability': 'Precip Chance:',
+      'cloud_coverage': 'Cloud Cover:',
+      'uv_index': 'UV Index:',
+      'ozone': 'Ozone:',
+    };
+
+    // Return mapped label if available
+    if (labelMappings[attribute] !== undefined) {
+      return labelMappings[attribute];
+    }
+
+    // Generate a label from the attribute name (e.g., "wind_speed" -> "Wind Speed:")
+    return attribute
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ') + ':';
+  }
+
+  private _renderAttributeSelect(entityId: string | undefined, configValue: string, currentValue: string | undefined, placeholder: string, unitConfigValue?: string, labelConfigValue?: string) {
     const attributes = this._getEntityAttributes(entityId);
     
     if (!entityId || attributes.length === 0) {
@@ -294,6 +335,7 @@ export class WeatherCardEditor extends LitElement {
         .value=${currentValue || ''}
         .configValue=${configValue}
         .unitConfigValue=${unitConfigValue || ''}
+        .labelConfigValue=${labelConfigValue || ''}
         .entityId=${entityId}
         @selected=${this._attributeChanged}
         @closed=${(e: Event) => e.stopPropagation()}
@@ -353,7 +395,7 @@ export class WeatherCardEditor extends LitElement {
           <div class="field-row">
             <div class="field">
               <span class="field-label">Attribute (optional)</span>
-              ${this._renderAttributeSelect(this._config.secondary_entity, 'secondary_attribute', this._config.secondary_attribute, 'apparent_temperature', 'secondary_unit')}
+              ${this._renderAttributeSelect(this._config.secondary_entity, 'secondary_attribute', this._config.secondary_attribute, 'apparent_temperature', 'secondary_unit', 'secondary_label')}
             </div>
             <div class="field">
               <span class="field-label">Unit (auto-filled, can override)</span>
@@ -361,8 +403,8 @@ export class WeatherCardEditor extends LitElement {
             </div>
           </div>
           <div class="field">
-            <span class="field-label">Label</span>
-            <ha-textfield .value=${this._config.secondary_label || ''} .configValue=${'secondary_label'} @input=${this._valueChanged} placeholder="Feels Like:"></ha-textfield>
+            <span class="field-label">Label (auto-filled, can override)</span>
+            <ha-textfield .value=${this._config.secondary_label ?? ''} .configValue=${'secondary_label'} @input=${this._valueChanged} placeholder="Feels Like:"></ha-textfield>
           </div>
         </div>
         <div class="section">
@@ -416,9 +458,10 @@ export class WeatherCardEditor extends LitElement {
 
   private _attributeChanged(ev: Event): void {
     if (!this._config || !this.hass) return;
-    const target = ev.target as HTMLElement & { configValue: string; unitConfigValue: string; entityId: string; value: string };
+    const target = ev.target as HTMLElement & { configValue: string; unitConfigValue: string; labelConfigValue: string; entityId: string; value: string };
     const configValue = target.configValue;
     const unitConfigValue = target.unitConfigValue;
+    const labelConfigValue = target.labelConfigValue;
     const entityId = target.entityId;
     const attribute = target.value;
 
@@ -429,17 +472,24 @@ export class WeatherCardEditor extends LitElement {
     
     if (attribute === '' || attribute === undefined) {
       delete newConfig[configValue];
-      // Also clear the unit when clearing attribute
+      // Also clear the unit and label when clearing attribute
       if (unitConfigValue) {
         delete newConfig[unitConfigValue];
       }
+      if (labelConfigValue) {
+        delete newConfig[labelConfigValue];
+      }
     } else {
       newConfig[configValue] = attribute;
-      // Auto-fill unit if we have a unitConfigValue and it's not already set by user
+      // Auto-fill unit if we have a unitConfigValue
       if (unitConfigValue) {
         const suggestedUnit = this._getAttributeUnit(entityId, attribute);
-        // Always update unit when attribute changes (user can override afterwards)
         newConfig[unitConfigValue] = suggestedUnit;
+      }
+      // Auto-fill label if we have a labelConfigValue
+      if (labelConfigValue) {
+        const suggestedLabel = this._getAttributeLabel(attribute);
+        newConfig[labelConfigValue] = suggestedLabel;
       }
     }
 

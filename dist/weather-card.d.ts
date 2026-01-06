@@ -56,6 +56,7 @@ export declare class WeatherCardEditor extends LitElement {
     setConfig(config: WeatherCardConfig): void;
     private _getEntityAttributes;
     private _getAttributeUnit;
+    private _getAttributeLabel;
     private _renderAttributeSelect;
     protected render(): import("lit-html").TemplateResult<1>;
     private _valueChanged;
