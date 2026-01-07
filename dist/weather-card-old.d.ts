@@ -1,14 +1,4 @@
-import { LitElement, TemplateResult } from 'lit';
-interface ActionConfig {
-    action: 'none' | 'more-info' | 'navigate' | 'call-service' | 'url';
-    navigation_path?: string;
-    url_path?: string;
-    service?: string;
-    service_data?: {
-        [key: string]: unknown;
-    };
-    entity?: string;
-}
+import { LitElement } from 'lit';
 interface WeatherCardConfig {
     type: string;
     weather_entity?: string;
@@ -26,15 +16,6 @@ interface WeatherCardConfig {
     greeting_name?: string;
     icon_size?: number;
     card_height?: string;
-    icon_position?: 'left' | 'right';
-    show_forecast?: boolean;
-    forecast_days?: number;
-    show_sunrise_sunset?: boolean;
-    show_alerts?: boolean;
-    show_background_effects?: boolean;
-    tap_action?: ActionConfig;
-    hold_action?: ActionConfig;
-    double_tap_action?: ActionConfig;
     view_layout?: {
         'grid-area'?: string;
         'grid-column'?: string;
@@ -62,8 +43,6 @@ interface HassEntity {
 export declare class WeatherCard extends LitElement {
     hass: HomeAssistant;
     private _config;
-    private _holdTimer?;
-    private _lastTap;
     static get styles(): import("lit").CSSResult;
     setConfig(config: WeatherCardConfig): void;
     getCardSize(): number;
@@ -76,20 +55,8 @@ export declare class WeatherCard extends LitElement {
     };
     static getConfigElement(): HTMLElement;
     static getStubConfig(): WeatherCardConfig;
-    connectedCallback(): void;
-    disconnectedCallback(): void;
-    private _handleTap;
-    private _handleHold;
-    private _handleTouchStart;
-    private _handleTouchEnd;
-    private _executeAction;
-    protected render(): TemplateResult<1>;
-    private _renderBackgroundEffect;
-    private _getEffectClass;
+    protected render(): import("lit-html").TemplateResult<1>;
     private _renderWeatherIcon;
-    private _renderSunTimes;
-    private _renderForecast;
-    private _renderAlerts;
     private _getGreeting;
     private _getPrimaryValue;
     private _getSecondaryValue;
@@ -105,12 +72,10 @@ export declare class WeatherCardEditor extends LitElement {
     private _getAttributeUnit;
     private _getAttributeLabel;
     private _renderAttributeSelect;
-    protected render(): TemplateResult<1>;
+    protected render(): import("lit-html").TemplateResult<1>;
+    private _viewLayoutChanged;
     private _valueChanged;
     private _attributeChanged;
-    private _actionChanged;
-    private _actionPathChanged;
-    private _viewLayoutChanged;
 }
 declare global {
     interface Window {
@@ -123,4 +88,4 @@ declare global {
     }
 }
 export {};
-//# sourceMappingURL=weather-card.d.ts.map
+//# sourceMappingURL=weather-card-old.d.ts.map
