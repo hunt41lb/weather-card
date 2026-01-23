@@ -577,39 +577,38 @@ export class WeatherCard extends LitElement {
   }
 
   private _getIconFilename(condition: string, isDay: boolean): string {
-    // Map condition to filename
     const normalizedCondition = condition?.toLowerCase().replace(/-/g, '') || 'cloudy';
     const timeOfDay = isDay ? 'day' : 'night';
     
-    // Map Home Assistant conditions to icon filenames
-    const conditionMap: { [key: string]: string } = {
-      'sunny': 'sunny',
-      'clear': 'sunny',
-      'clearnight': 'clear-night',
-      'partlycloudy': 'partlycloudy',
-      'cloudy': 'cloudy',
-      'rainy': 'rainy',
-      'pouring': 'pouring',
-      'snowy': 'snowy',
-      'snowyrainy': 'snowy-rainy',
-      'fog': 'fog',
-      'foggy': 'fog',
-      'hail': 'hail',
-      'lightning': 'lightning',
-      'lightningrainy': 'lightning-rainy',
-      'windy': 'windy',
-      'windyvariant': 'windy-variant',
-      'exceptional': 'exceptional',
+    // Map Home Assistant conditions to exact icon filenames (matching your icons directory)
+    const iconFilenames: { [key: string]: { day: string; night: string } } = {
+      'sunny': { day: 'sunny_day.svg', night: 'clear-night_night.svg' },
+      'clear': { day: 'clear_day.svg', night: 'clear-night_night.svg' },
+      'clearnight': { day: 'clear_day.svg', night: 'clear-night_night.svg' },
+      'partlycloudy': { day: 'partlycloudy_day.svg', night: 'partlycloudy_night.svg' },
+      'cloudy': { day: 'cloudy-day.svg', night: 'cloudy-night.svg' },
+      'rainy': { day: 'rainy-day.svg', night: 'rainy-night.svg' },
+      'pouring': { day: 'rainy-day.svg', night: 'rainy-night.svg' },
+      'snowy': { day: 'snowy_day.svg', night: 'snowy_night.svg' },
+      'snowyrainy': { day: 'snowy-rainy_day.svg', night: 'snowy-rainy_night.svg' },
+      'fog': { day: 'foggy-day.svg', night: 'foggy-night.svg' },
+      'foggy': { day: 'foggy-day.svg', night: 'foggy-night.svg' },
+      'hail': { day: 'hail_day.svg', night: 'hail_night.svg' },
+      'lightning': { day: 'thunderstorms_day.svg', night: 'thunderstorms_night.svg' },
+      'lightningrainy': { day: 'thunderstorms_day.svg', night: 'thunderstorms_night.svg' },
+      'thunderstorm': { day: 'thunderstorms_day.svg', night: 'thunderstorms_night.svg' },
+      'windy': { day: 'windy_day.svg', night: 'windy_night.svg' },
+      'windyvariant': { day: 'windy_day.svg', night: 'windy_night.svg' },
+      'exceptional': { day: 'cloudy-day.svg', night: 'cloudy-night.svg' },
     };
     
-    const mappedCondition = conditionMap[normalizedCondition] || normalizedCondition;
-    
-    // Special case for clear-night (no day variant)
-    if (mappedCondition === 'clear-night') {
-      return 'clear-night_night.svg';
+    const iconSet = iconFilenames[normalizedCondition];
+    if (iconSet) {
+      return isDay ? iconSet.day : iconSet.night;
     }
     
-    return `${mappedCondition}_${timeOfDay}.svg`;
+    // Fallback to cloudy
+    return isDay ? 'cloudy-day.svg' : 'cloudy-night.svg';
   }
 
   private _renderWeatherIcon(condition: string, isDay: boolean) {
