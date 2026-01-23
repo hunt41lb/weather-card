@@ -138,16 +138,16 @@ export class WeatherCard extends LitElement {
   static get styles() {
     return css`
       :host { display: block; }
-      ha-card { 
-        padding: 12px; 
-        box-sizing: border-box; 
+      ha-card {
+        padding: 12px;
+        box-sizing: border-box;
         overflow: hidden;
         position: relative;
         cursor: pointer;
         background: var(--weather-card-background, var(--ha-card-background, var(--card-background-color)));
         color: var(--weather-card-text-color, var(--primary-text-color));
       }
-      
+
       /* Background effects container */
       .weather-effects {
         position: absolute;
@@ -156,7 +156,7 @@ export class WeatherCard extends LitElement {
         overflow: hidden;
         z-index: 0;
       }
-      
+
       /* Rain effect */
       .effect-rain {
         background: linear-gradient(transparent 0%, rgba(100, 150, 200, 0.3) 100%);
@@ -173,15 +173,15 @@ export class WeatherCard extends LitElement {
         animation: rain-fall 0.3s linear infinite;
       }
       @keyframes rain-fall { 0% { transform: translateY(-10%); } 100% { transform: translateY(10%); } }
-      
+
       /* Snow effect - enhanced with snowbank */
       .effect-snow {
-        background: linear-gradient(180deg, 
-          rgba(220, 230, 245, 0.02) 0%, 
+        background: linear-gradient(180deg,
+          rgba(220, 230, 245, 0.02) 0%,
           rgba(200, 215, 235, 0.05) 100%
         );
       }
-      
+
       /* Snowbank at bottom */
       .snow-bank {
         position: absolute;
@@ -197,46 +197,139 @@ export class WeatherCard extends LitElement {
         width: 100%;
         height: 100%;
       }
-      
-      /* Falling snowflakes */
-      .snow-layer {
+
+/* Falling snowflakes - 6 independent layers with prime-number timing */
+      .snow-container {
         position: absolute;
-        top: 0; left: -10px; right: -10px; bottom: 28px;
+        top: 0; left: -20px; right: -20px; bottom: 28px;
+        overflow: hidden;
+      }
+
+      /* Layer 1: Large slow flakes (background) */
+      .snow-container .layer-1 {
+        position: absolute;
+        left: 0; right: 0;
+        top: -100%;
+        height: 300%;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.8) 2.5px, transparent 2.5px);
+        background-size: 90px 90px;
+        background-position: 0 0;
+        animation: snowfall-1 23s linear infinite;
+        animation-delay: -7s;
+        opacity: 0.4;
+      }
+
+      /* Layer 2 */
+      .snow-container .layer-2 {
+        position: absolute;
+        left: 0; right: 0;
+        top: -100%;
+        height: 300%;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.85) 2px, transparent 2px);
+        background-size: 70px 70px;
+        background-position: 35px 20px;
+        animation: snowfall-2 17s linear infinite, drift-a 13s ease-in-out infinite;
+        animation-delay: -3s, -5s;
+        opacity: 0.5;
+      }
+
+      /* Layer 3 */
+      .snow-container .layer-3 {
+        position: absolute;
+        left: 0; right: 0;
+        top: -100%;
+        height: 300%;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.9) 1.8px, transparent 1.8px);
+        background-size: 55px 55px;
+        background-position: 15px 40px;
+        animation: snowfall-3 13s linear infinite, drift-b 17s ease-in-out infinite;
+        animation-delay: -11s, -2s;
+        opacity: 0.55;
+      }
+
+      /* Layer 4 */
+      .snow-container .layer-4 {
+        position: absolute;
+        left: 0; right: 0;
+        top: -100%;
+        height: 300%;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.95) 1.5px, transparent 1.5px);
+        background-size: 45px 45px;
+        background-position: 25px 10px;
+        animation: snowfall-4 11s linear infinite, drift-c 19s ease-in-out infinite;
+        animation-delay: -6s, -8s;
         opacity: 0.6;
       }
-      .snow-layer .snowflakes {
+
+      /* Layer 5: Small fast flakes */
+      .snow-container .layer-5 {
         position: absolute;
-        top: -100%; left: 0; right: 0; height: 200%;
-        background-image: 
-          radial-gradient(circle, rgba(255,255,255,0.95) 2px, transparent 2px),
-          radial-gradient(circle, rgba(255,255,255,0.85) 1.5px, transparent 1.5px),
-          radial-gradient(circle, rgba(255,255,255,0.9) 2.5px, transparent 2.5px),
-          radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
-        background-size: 47px 53px, 73px 79px, 61px 67px, 89px 97px;
-        background-position: 0 0, 20px 30px, 45px 15px, 70px 50px;
-        animation: snow-fall 8s linear infinite, snow-drift 6s ease-in-out infinite;
+        left: 0; right: 0;
+        top: -100%;
+        height: 300%;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.85) 1.2px, transparent 1.2px);
+        background-size: 35px 35px;
+        background-position: 10px 25px;
+        animation: snowfall-5 7s linear infinite, drift-d 23s ease-in-out infinite;
+        animation-delay: -2s, -13s;
+        opacity: 0.65;
       }
-      
-      @keyframes snow-fall {
-        0% { transform: translateY(0); }
-        100% { transform: translateY(50%); }
+
+      /* Layer 6: Tiny fastest flakes (foreground) */
+      .snow-container .layer-6 {
+        position: absolute;
+        left: 0; right: 0;
+        top: -100%;
+        height: 300%;
+        background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
+        background-size: 25px 25px;
+        background-position: 5px 15px;
+        animation: snowfall-6 5s linear infinite, drift-e 11s ease-in-out infinite;
+        animation-delay: -1s, -4s;
+        opacity: 0.7;
       }
-      
-      @keyframes snow-drift {
-        0%, 100% { margin-left: 0; }
-        50% { margin-left: 10px; }
-      }
-      
+
+      /* Fall keyframes - 33.333% of 300% container = 100% viewport for seamless loop */
+      @keyframes snowfall-1 { from { transform: translateY(0); } to { transform: translateY(33.3333%); } }
+      @keyframes snowfall-2 { from { transform: translateY(0); } to { transform: translateY(33.3333%); } }
+      @keyframes snowfall-3 { from { transform: translateY(0); } to { transform: translateY(33.3333%); } }
+      @keyframes snowfall-4 { from { transform: translateY(0); } to { transform: translateY(33.3333%); } }
+      @keyframes snowfall-5 { from { transform: translateY(0); } to { transform: translateY(33.3333%); } }
+      @keyframes snowfall-6 { from { transform: translateY(0); } to { transform: translateY(33.3333%); } }
+
+      /* Drift keyframes - different directions for variety */
+      @keyframes drift-a { 0%, 100% { margin-left: 0; } 50% { margin-left: 20px; } }
+      @keyframes drift-b { 0%, 100% { margin-left: 10px; } 50% { margin-left: -15px; } }
+      @keyframes drift-c { 0%, 100% { margin-left: -5px; } 50% { margin-left: 25px; } }
+      @keyframes drift-d { 0%, 100% { margin-left: 15px; } 50% { margin-left: -10px; } }
+      @keyframes drift-e { 0%, 100% { margin-left: -10px; } 50% { margin-left: 15px; } }
+
+      /* Snow intensity: Light - slower, fewer layers */
+      .effect-snow.intensity-light .layer-1 { animation-duration: 34s; opacity: 0.25; }
+      .effect-snow.intensity-light .layer-2 { animation-duration: 26s; opacity: 0.3; }
+      .effect-snow.intensity-light .layer-3 { animation-duration: 20s; opacity: 0.35; }
+      .effect-snow.intensity-light .layer-4 { animation-duration: 16s; opacity: 0.4; }
+      .effect-snow.intensity-light .layer-5 { display: none; }
+      .effect-snow.intensity-light .layer-6 { display: none; }
+
+      /* Snow intensity: Heavy - faster, more opaque */
+      .effect-snow.intensity-heavy .layer-1 { animation-duration: 16s; opacity: 0.5; }
+      .effect-snow.intensity-heavy .layer-2 { animation-duration: 12s; opacity: 0.55; }
+      .effect-snow.intensity-heavy .layer-3 { animation-duration: 9s; opacity: 0.6; }
+      .effect-snow.intensity-heavy .layer-4 { animation-duration: 7s; opacity: 0.7; }
+      .effect-snow.intensity-heavy .layer-5 { animation-duration: 5s; opacity: 0.75; }
+      .effect-snow.intensity-heavy .layer-6 { animation-duration: 3.5s; opacity: 0.8; }
+
       /* Fog effect */
       .effect-fog {
-        background: linear-gradient(90deg, 
-          transparent 0%, rgba(200, 200, 200, 0.3) 25%, 
+        background: linear-gradient(90deg,
+          transparent 0%, rgba(200, 200, 200, 0.3) 25%,
           rgba(200, 200, 200, 0.2) 50%, rgba(200, 200, 200, 0.3) 75%, transparent 100%);
         animation: fog-move 8s ease-in-out infinite;
         opacity: 0.4;
       }
       @keyframes fog-move { 0%, 100% { transform: translateX(-20%); } 50% { transform: translateX(20%); } }
-      
+
       /* Main grid */
       .weather-card-grid {
         display: grid;
@@ -285,40 +378,40 @@ export class WeatherCard extends LitElement {
           "forecast forecast forecast forecast"
           "alerts alerts alerts alerts";
       }
-      
+
       .greeting { grid-area: greeting; font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 4px; color: var(--weather-card-greeting-color, var(--primary-text-color)); }
       .weather-icon { grid-area: icon; display: flex; align-items: center; justify-content: center; }
       .weather-icon svg { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
       .primary-value { grid-area: primary; font-size: var(--weather-card-primary-font-size, 40px); font-weight: 400; line-height: 1; display: flex; align-items: flex-end; justify-content: center; color: var(--weather-card-primary-color, var(--primary-text-color)); }
       .secondary-value { grid-area: secondary; font-size: var(--weather-card-secondary-font-size, 12px); font-weight: 400; opacity: 0.8; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; color: var(--weather-card-secondary-color, var(--secondary-text-color)); }
       .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 4px; color: var(--weather-card-description-color, var(--primary-text-color)); }
-      
+
       /* Sun times */
-      .sun-times { 
-        grid-area: sun-times; 
-        display: flex; 
-        justify-content: center; 
-        gap: 24px; 
+      .sun-times {
+        grid-area: sun-times;
+        display: flex;
+        justify-content: center;
+        gap: 24px;
         padding: 8px 0 4px 0;
         font-size: 12px;
         opacity: 0.8;
       }
       .sun-time { display: flex; align-items: center; gap: 4px; }
       .sun-icon { font-size: 14px; }
-      
+
       /* Forecast */
-      .forecast { 
-        grid-area: forecast; 
-        display: flex; 
-        justify-content: space-around; 
+      .forecast {
+        grid-area: forecast;
+        display: flex;
+        justify-content: space-around;
         padding: 8px 0;
         border-top: 1px solid var(--divider-color, rgba(0,0,0,0.1));
         margin-top: 8px;
       }
-      .forecast-day { 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
+      .forecast-day {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         font-size: 11px;
         min-width: 40px;
       }
@@ -327,17 +420,17 @@ export class WeatherCard extends LitElement {
       .forecast-temps { display: flex; gap: 4px; }
       .forecast-high { font-weight: 600; }
       .forecast-low { opacity: 0.6; }
-      
+
       /* Alerts */
-      .alerts { 
-        grid-area: alerts; 
+      .alerts {
+        grid-area: alerts;
         padding: 8px;
         margin-top: 8px;
         background: var(--weather-card-alert-background, rgba(255, 152, 0, 0.2));
         border-radius: 4px;
         border-left: 3px solid var(--weather-card-alert-color, #ff9800);
       }
-      .alert { 
+      .alert {
         font-size: 12px;
         display: flex;
         align-items: flex-start;
@@ -347,17 +440,17 @@ export class WeatherCard extends LitElement {
       .alert-text { flex: 1; }
       .alert-title { font-weight: 600; }
       .alert-description { opacity: 0.8; font-size: 11px; }
-      
+
       .unavailable { opacity: 0.5; font-style: italic; }
     `;
   }
 
   public setConfig(config: WeatherCardConfig): void {
     if (!config) throw new Error('Invalid configuration');
-    this._config = { 
-      show_greeting: true, 
-      icon_size: 100, 
-      card_height: 'auto', 
+    this._config = {
+      show_greeting: true,
+      icon_size: 100,
+      card_height: 'auto',
       sun_entity: 'sun.sun',
       icon_position: 'left',
       show_forecast: false,
@@ -368,30 +461,30 @@ export class WeatherCard extends LitElement {
       tap_action: { action: 'more-info' },
       hold_action: { action: 'none' },
       double_tap_action: { action: 'none' },
-      ...config 
+      ...config
     };
   }
 
   public getCardSize(): number { return 3; }
-  
+
   public getLayoutOptions() {
     return this._config?.view_layout || {};
   }
-  
+
   public static getConfigElement(): HTMLElement { return document.createElement('weather-card-editor'); }
   public static getStubConfig(): WeatherCardConfig {
-    return { 
-      type: 'custom:weather-card', 
-      weather_entity: 'weather.forecast_home', 
-      sun_entity: 'sun.sun', 
-      primary_entity: 'weather.forecast_home', 
-      primary_attribute: 'temperature', 
-      primary_unit: '°F', 
-      secondary_entity: 'weather.forecast_home', 
-      secondary_attribute: 'apparent_temperature', 
-      secondary_unit: '°F', 
-      secondary_label: 'Feels Like:', 
-      show_greeting: true, 
+    return {
+      type: 'custom:weather-card',
+      weather_entity: 'weather.forecast_home',
+      sun_entity: 'sun.sun',
+      primary_entity: 'weather.forecast_home',
+      primary_attribute: 'temperature',
+      primary_unit: '°F',
+      secondary_entity: 'weather.forecast_home',
+      secondary_attribute: 'apparent_temperature',
+      secondary_unit: '°F',
+      secondary_label: 'Feels Like:',
+      show_greeting: true,
       icon_size: 100,
       show_forecast: true,
       forecast_days: 5,
@@ -451,7 +544,7 @@ export class WeatherCard extends LitElement {
 
   private _executeAction(action?: ActionConfig) {
     if (!action || action.action === 'none') return;
-    
+
     switch (action.action) {
       case 'more-info':
         const entityId = action.entity || this._config.weather_entity;
@@ -489,12 +582,12 @@ export class WeatherCard extends LitElement {
     const description = this._getDescription();
     const showGreeting = this._config.show_greeting !== false;
     const iconRight = this._config.icon_position === 'right';
-    
+
     const weatherEntity = this._config.weather_entity ? this.hass.states[this._config.weather_entity] : undefined;
     const sunEntity = this._config.sun_entity ? this.hass.states[this._config.sun_entity] : undefined;
     const condition = weatherEntity?.state || '';
     const isDay = sunEntity?.state === 'above_horizon';
-    
+
     const gridClasses = [
       'weather-card-grid',
       showGreeting ? '' : 'no-greeting',
@@ -523,16 +616,22 @@ export class WeatherCard extends LitElement {
   private _renderBackgroundEffect(condition: string): TemplateResult {
     const effectClass = this._getEffectClass(condition);
     if (!effectClass) return html``;
-    
+
     // For snow, render the enhanced effect with snowbank
     if (effectClass === 'effect-snow') {
+      const intensityClass = this._getSnowIntensity();
       return html`
-        <div class="weather-effects ${effectClass}">
-          <!-- Falling snowflakes -->
-          <div class="snow-layer">
-            <div class="snowflakes"></div>
+        <div class="weather-effects ${effectClass} ${intensityClass}">
+          <!-- Falling snowflakes - 6 independent layers -->
+          <div class="snow-container">
+            <div class="layer-1"></div>
+            <div class="layer-2"></div>
+            <div class="layer-3"></div>
+            <div class="layer-4"></div>
+            <div class="layer-5"></div>
+            <div class="layer-6"></div>
           </div>
-          
+
           <!-- Snowbank at bottom -->
           <div class="snow-bank">
             <svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
@@ -542,20 +641,20 @@ export class WeatherCard extends LitElement {
                   <stop offset="100%" stop-color="rgba(240,245,255,1)"/>
                 </linearGradient>
               </defs>
-              <path d="M0,100 L0,65 
-                Q10,55 20,60 
-                Q30,65 40,55 
-                Q50,45 60,55 
-                Q70,65 80,58 
-                Q90,50 100,60 
-                L100,100 Z" 
+              <path d="M0,100 L0,65
+                Q10,55 20,60
+                Q30,65 40,55
+                Q50,45 60,55
+                Q70,65 80,58
+                Q90,50 100,60
+                L100,100 Z"
                 fill="url(#snowFill)"/>
             </svg>
           </div>
         </div>
       `;
     }
-    
+
     // For other effects, use simple container
     return html`<div class="weather-effects ${effectClass}"></div>`;
   }
@@ -568,6 +667,23 @@ export class WeatherCard extends LitElement {
     return '';
   }
 
+  private _getSnowIntensity(): string {
+    const weatherEntity = this._config.weather_entity
+      ? this.hass.states[this._config.weather_entity]
+      : undefined;
+
+    if (!weatherEntity) return '';
+
+    // Get precipitation amount (mm/h typically)
+    const precipitation = Number(weatherEntity.attributes?.precipitation) || 0;
+
+    // Map precipitation to intensity class
+    // Light: < 1 mm/h, Normal: 1-4 mm/h, Heavy: > 4 mm/h
+    if (precipitation >= 4) return 'intensity-heavy';
+    if (precipitation < 1) return 'intensity-light';
+    return ''; // default/normal intensity
+  }
+
   private _renderWeatherIcon(condition: string, isDay: boolean) {
     if (!condition) return html`<span class="unavailable">No weather entity</span>`;
     const svgContent = getWeatherIcon(condition, isDay);
@@ -577,10 +693,10 @@ export class WeatherCard extends LitElement {
   private _renderSunTimes(): TemplateResult {
     const sunEntity = this._config.sun_entity ? this.hass.states[this._config.sun_entity] : undefined;
     if (!sunEntity) return html``;
-    
+
     const sunrise = sunEntity.attributes.next_rising as string;
     const sunset = sunEntity.attributes.next_setting as string;
-    
+
     const formatTime = (isoString: string): string => {
       if (!isoString) return '--:--';
       const date = new Date(isoString);
@@ -604,19 +720,19 @@ export class WeatherCard extends LitElement {
   private _renderForecast(): TemplateResult {
     const weatherEntity = this._config.weather_entity ? this.hass.states[this._config.weather_entity] : undefined;
     if (!weatherEntity) return html``;
-    
+
     const forecast = weatherEntity.attributes.forecast as ForecastDay[] | undefined;
     if (!forecast || forecast.length === 0) return html``;
-    
+
     const days = forecast.slice(0, this._config.forecast_days || 5);
     const unit = this._config.primary_unit || '°';
-    
+
     const getDayName = (dateStr: string): string => {
       const date = new Date(dateStr);
       const today = new Date();
       const tomorrow = new Date(today);
       tomorrow.setDate(tomorrow.getDate() + 1);
-      
+
       if (date.toDateString() === today.toDateString()) return 'Today';
       if (date.toDateString() === tomorrow.toDateString()) return 'Tmrw';
       return date.toLocaleDateString([], { weekday: 'short' });
@@ -641,13 +757,13 @@ export class WeatherCard extends LitElement {
   private _renderAlerts(): TemplateResult {
     const weatherEntity = this._config.weather_entity ? this.hass.states[this._config.weather_entity] : undefined;
     if (!weatherEntity) return html``;
-    
+
     const alerts = weatherEntity.attributes.alerts as Array<{ title?: string; description?: string }> | undefined;
     if (!alerts || alerts.length === 0) return html``;
-    
+
     // Show only first alert
     const alert = alerts[0];
-    
+
     return html`
       <div class="alerts">
         <div class="alert">
@@ -802,7 +918,7 @@ export class WeatherCardEditor extends LitElement {
             <ha-entity-picker .hass=${this.hass} .value=${this._config.sun_entity || 'sun.sun'} .configValue=${'sun_entity'} @value-changed=${this._valueChanged} .entityFilter=${(entity: { entity_id: string }) => entity.entity_id.startsWith('sun.')} allow-custom-entity></ha-entity-picker>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Icon Settings</div>
           <div class="field-row">
@@ -819,7 +935,7 @@ export class WeatherCardEditor extends LitElement {
             </div>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Primary Value</div>
           <div class="field">
@@ -837,7 +953,7 @@ export class WeatherCardEditor extends LitElement {
             </div>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Secondary Value</div>
           <div class="field">
@@ -859,7 +975,7 @@ export class WeatherCardEditor extends LitElement {
             <ha-textfield .value=${this._config.secondary_label ?? ''} .configValue=${'secondary_label'} @input=${this._valueChanged} placeholder="Feels Like:"></ha-textfield>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Description</div>
           <div class="field">
@@ -871,7 +987,7 @@ export class WeatherCardEditor extends LitElement {
             ${this._renderAttributeSelect(this._config.description_entity, 'description_attribute', this._config.description_attribute, 'desc')}
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Features</div>
           <div class="field">
@@ -910,7 +1026,7 @@ export class WeatherCardEditor extends LitElement {
             </ha-formfield>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Tap Actions</div>
           <div class="field">
@@ -953,7 +1069,7 @@ export class WeatherCardEditor extends LitElement {
             </ha-select>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Appearance</div>
           <div class="field">
@@ -961,7 +1077,7 @@ export class WeatherCardEditor extends LitElement {
             <ha-textfield .value=${this._config.card_height || 'auto'} .configValue=${'card_height'} @input=${this._valueChanged} placeholder="auto or 180px"></ha-textfield>
           </div>
         </div>
-        
+
         <div class="section">
           <div class="section-title">Layout</div>
           <div class="field">
