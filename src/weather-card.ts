@@ -295,7 +295,7 @@ export class WeatherCard extends LitElement {
       
       .greeting { grid-area: greeting; font-size: 20px; font-weight: 600; text-align: center; padding-bottom: 4px; color: var(--weather-card-greeting-color, var(--primary-text-color)); }
       .weather-icon { grid-area: icon; display: flex; align-items: center; justify-content: center; }
-      .weather-icon svg { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
+      .weather-icon svg, .weather-icon img { width: var(--weather-icon-size, 100px); height: var(--weather-icon-size, 100px); }
       .primary-value { grid-area: primary; font-size: var(--weather-card-primary-font-size, 40px); font-weight: 400; line-height: 1; display: flex; align-items: flex-end; justify-content: center; color: var(--weather-card-primary-color, var(--primary-text-color)); }
       .secondary-value { grid-area: secondary; font-size: var(--weather-card-secondary-font-size, 12px); font-weight: 400; opacity: 0.8; display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; color: var(--weather-card-secondary-color, var(--secondary-text-color)); }
       .description { grid-area: description; font-size: 18px; font-weight: 600; text-align: center; padding-top: 4px; color: var(--weather-card-description-color, var(--primary-text-color)); }
@@ -619,7 +619,7 @@ export class WeatherCard extends LitElement {
     const filename = this._getIconFilename(condition, isDay);
     const iconUrl = `${iconsPath}/${filename}`;
     
-    return html`<img src="${iconUrl}" alt="${condition}" style="width: 100%; height: 100%;" />`;
+    return html`<img src="${iconUrl}" alt="${filename}" />`;
   }
 
   private _renderSunTimes(): TemplateResult {
