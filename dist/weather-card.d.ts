@@ -86,6 +86,7 @@ export declare class WeatherCard extends LitElement {
     protected render(): TemplateResult<1>;
     private _renderBackgroundEffect;
     private _getEffectClass;
+    private _getSnowIntensity;
     private _renderWeatherIcon;
     private _renderSunTimes;
     private _renderForecast;
