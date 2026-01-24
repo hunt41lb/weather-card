@@ -33,6 +33,8 @@ interface WeatherCardConfig {
     show_alerts?: boolean;
     show_background_effects?: boolean;
     use_dynamic_background?: boolean;
+    day_background?: string;
+    night_background?: string;
     tap_action?: ActionConfig;
     hold_action?: ActionConfig;
     double_tap_action?: ActionConfig;
