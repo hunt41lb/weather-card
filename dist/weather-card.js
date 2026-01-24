@@ -223,9 +223,9 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
       /* Main light streak */
       .effect-sunny .streak-main {
         position: absolute;
-        top: 10%;
-        left: 10%;
-        width: 180px;
+        top: 0;
+        left: 0;
+        width: 200px;
         height: 2px;
         background: linear-gradient(90deg,
           rgba(255, 255, 255, 0.8) 0%,
@@ -234,7 +234,7 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
           transparent 100%
         );
         transform: rotate(50deg);
-        transform-origin: left center;
+        transform-origin: 0% 0%;
         animation: sunny-streak-glow 7s ease-in-out infinite;
       }
 
@@ -423,8 +423,8 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
       .alert-description { opacity: 0.8; font-size: 11px; }
 
       .unavailable { opacity: 0.5; font-style: italic; }
-    `}setConfig(t){if(!t)throw new Error("Invalid configuration");this._config={show_greeting:!0,icon_size:100,card_height:"auto",sun_entity:"sun.sun",icon_position:"left",show_forecast:!1,forecast_days:5,show_sunrise_sunset:!1,show_alerts:!1,show_background_effects:!1,tap_action:{action:"more-info"},hold_action:{action:"none"},double_tap_action:{action:"none"},...t}}getCardSize(){return 3}getLayoutOptions(){return this._config?.view_layout||{}}static getConfigElement(){return document.createElement("weather-card-editor")}static getStubConfig(){return{type:"custom:weather-card",weather_entity:"weather.forecast_home",sun_entity:"sun.sun",primary_entity:"weather.forecast_home",primary_attribute:"temperature",primary_unit:"°F",secondary_entity:"weather.forecast_home",secondary_attribute:"apparent_temperature",secondary_unit:"°F",secondary_label:"Feels Like:",show_greeting:!0,icon_size:100,show_forecast:!0,forecast_days:5,show_sunrise_sunset:!0}}connectedCallback(){super.connectedCallback(),this.addEventListener("click",this._handleTap),this.addEventListener("contextmenu",this._handleHold),this.addEventListener("touchstart",this._handleTouchStart,{passive:!0}),this.addEventListener("touchend",this._handleTouchEnd)}disconnectedCallback(){super.disconnectedCallback(),this.removeEventListener("click",this._handleTap),this.removeEventListener("contextmenu",this._handleHold),this.removeEventListener("touchstart",this._handleTouchStart),this.removeEventListener("touchend",this._handleTouchEnd)}_executeAction(t){if(t&&"none"!==t.action)switch(t.action){case"more-info":const e=t.entity||this._config.weather_entity;if(e){const t=new CustomEvent("hass-more-info",{detail:{entityId:e},bubbles:!0,composed:!0});this.dispatchEvent(t)}break;case"navigate":if(t.navigation_path){history.pushState(null,"",t.navigation_path);const e=new CustomEvent("location-changed",{bubbles:!0,composed:!0});this.dispatchEvent(e)}break;case"url":t.url_path&&window.open(t.url_path,"_blank");break;case"call-service":if(t.service){const[e,i]=t.service.split(".");this.hass.callService(e,i,t.service_data||{})}}}render(){if(!this._config||!this.hass)return j``;const t=this._getGreeting(),e=this._getPrimaryValue(),i=this._getSecondaryValue(),a=this._getDescription(),r=!1!==this._config.show_greeting,s="right"===this._config.icon_position,n=this._config.weather_entity?this.hass.states[this._config.weather_entity]:void 0,o=this._config.sun_entity?this.hass.states[this._config.sun_entity]:void 0,l=n?.state||"",d="above_horizon"===o?.state,f=["weather-card-grid",r?"":"no-greeting",s?"icon-right":""].filter(Boolean).join(" ");return j`
-      <ha-card style="height: ${this._config.card_height}">
+    `}setConfig(t){if(!t)throw new Error("Invalid configuration");this._config={show_greeting:!0,icon_size:100,card_height:"auto",sun_entity:"sun.sun",icon_position:"left",show_forecast:!1,forecast_days:5,show_sunrise_sunset:!1,show_alerts:!1,show_background_effects:!1,use_dynamic_background:!1,tap_action:{action:"more-info"},hold_action:{action:"none"},double_tap_action:{action:"none"},...t}}getCardSize(){return 3}getLayoutOptions(){return this._config?.view_layout||{}}static getConfigElement(){return document.createElement("weather-card-editor")}static getStubConfig(){return{type:"custom:weather-card",weather_entity:"weather.forecast_home",sun_entity:"sun.sun",primary_entity:"weather.forecast_home",primary_attribute:"temperature",primary_unit:"°F",secondary_entity:"weather.forecast_home",secondary_attribute:"apparent_temperature",secondary_unit:"°F",secondary_label:"Feels Like:",show_greeting:!0,icon_size:100,show_forecast:!0,forecast_days:5,show_sunrise_sunset:!0}}connectedCallback(){super.connectedCallback(),this.addEventListener("click",this._handleTap),this.addEventListener("contextmenu",this._handleHold),this.addEventListener("touchstart",this._handleTouchStart,{passive:!0}),this.addEventListener("touchend",this._handleTouchEnd)}disconnectedCallback(){super.disconnectedCallback(),this.removeEventListener("click",this._handleTap),this.removeEventListener("contextmenu",this._handleHold),this.removeEventListener("touchstart",this._handleTouchStart),this.removeEventListener("touchend",this._handleTouchEnd)}_executeAction(t){if(t&&"none"!==t.action)switch(t.action){case"more-info":const e=t.entity||this._config.weather_entity;if(e){const t=new CustomEvent("hass-more-info",{detail:{entityId:e},bubbles:!0,composed:!0});this.dispatchEvent(t)}break;case"navigate":if(t.navigation_path){history.pushState(null,"",t.navigation_path);const e=new CustomEvent("location-changed",{bubbles:!0,composed:!0});this.dispatchEvent(e)}break;case"url":t.url_path&&window.open(t.url_path,"_blank");break;case"call-service":if(t.service){const[e,i]=t.service.split(".");this.hass.callService(e,i,t.service_data||{})}}}render(){if(!this._config||!this.hass)return j``;const t=this._getGreeting(),e=this._getPrimaryValue(),i=this._getSecondaryValue(),a=this._getDescription(),r=!1!==this._config.show_greeting,s="right"===this._config.icon_position,n=this._config.weather_entity?this.hass.states[this._config.weather_entity]:void 0,o=this._config.sun_entity?this.hass.states[this._config.sun_entity]:void 0,l=n?.state||"",d="above_horizon"===o?.state,f=["weather-card-grid",r?"":"no-greeting",s?"icon-right":""].filter(Boolean).join(" "),c=this._config.use_dynamic_background?`background-color: var(${d?"--state-sun-above_horizon-color":"--state-sun-below_horizon-color"}, var(--ha-card-background, var(--card-background-color)));`:"";return j`
+      <ha-card style="height: ${this._config.card_height}; ${c}">
         ${this._config.show_background_effects?this._renderBackgroundEffect(l):F}
         <div class="${f}" style="--weather-icon-size: ${this._config.icon_size}px">
           ${r?j`<div class="greeting">${t}</div>`:F}
@@ -648,6 +648,11 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
           <div class="field">
             <ha-formfield label="Show Background Effects">
               <ha-switch .checked=${!0===this._config.show_background_effects} .configValue=${"show_background_effects"} @change=${this._valueChanged}></ha-switch>
+            </ha-formfield>
+          </div>
+          <div class="field">
+            <ha-formfield label="Dynamic Background (Day/Night)">
+              <ha-switch .checked=${!0===this._config.use_dynamic_background} .configValue=${"use_dynamic_background"} @change=${this._valueChanged}></ha-switch>
             </ha-formfield>
           </div>
         </div>

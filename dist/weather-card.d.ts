@@ -32,6 +32,7 @@ interface WeatherCardConfig {
     show_sunrise_sunset?: boolean;
     show_alerts?: boolean;
     show_background_effects?: boolean;
+    use_dynamic_background?: boolean;
     tap_action?: ActionConfig;
     hold_action?: ActionConfig;
     double_tap_action?: ActionConfig;
