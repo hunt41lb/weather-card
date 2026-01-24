@@ -38,6 +38,8 @@ interface WeatherCardConfig {
   show_alerts?: boolean;
   show_background_effects?: boolean;
   use_dynamic_background?: boolean;
+  day_background?: string;
+  night_background?: string;
   // Tap actions
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
@@ -579,6 +581,8 @@ export class WeatherCard extends LitElement {
       show_alerts: false,
       show_background_effects: false,
       use_dynamic_background: false,
+      day_background: 'linear-gradient(180deg, #87CEEB 0%, #4A90C2 100%)',
+      night_background: 'linear-gradient(180deg, #1a1a2e 0%, #0d1421 100%)',
       tap_action: { action: 'more-info' },
       hold_action: { action: 'none' },
       double_tap_action: { action: 'none' },
@@ -716,8 +720,10 @@ export class WeatherCard extends LitElement {
     ].filter(Boolean).join(' ');
 
     // Dynamic background color based on sun state
+    const dayBg = this._config.day_background || 'linear-gradient(180deg, #87CEEB 0%, #4A90C2 100%)';
+    const nightBg = this._config.night_background || 'linear-gradient(180deg, #1a1a2e 0%, #0d1421 100%)';
     const dynamicBgStyle = this._config.use_dynamic_background
-      ? `background-color: var(${isDay ? '--light-blue-color' : '--black-color'}, ${isDay ? '#03a9f4' : '#000000'});`
+      ? `background: ${isDay ? dayBg : nightBg};`
       : '';
 
     return html`
@@ -1170,6 +1176,26 @@ export class WeatherCardEditor extends LitElement {
               <ha-switch .checked=${this._config.use_dynamic_background === true} .configValue=${'use_dynamic_background'} @change=${this._valueChanged}></ha-switch>
             </ha-formfield>
           </div>
+          ${this._config.use_dynamic_background ? html`
+            <div class="field">
+              <span class="field-label">Day Background (color or gradient)</span>
+              <ha-textfield 
+                .value=${this._config.day_background || 'linear-gradient(180deg, #87CEEB 0%, #4A90C2 100%)'} 
+                .configValue=${'day_background'} 
+                @input=${this._valueChanged}
+                placeholder="linear-gradient(180deg, #87CEEB 0%, #4A90C2 100%)"
+              ></ha-textfield>
+            </div>
+            <div class="field">
+              <span class="field-label">Night Background (color or gradient)</span>
+              <ha-textfield 
+                .value=${this._config.night_background || 'linear-gradient(180deg, #1a1a2e 0%, #0d1421 100%)'} 
+                .configValue=${'night_background'} 
+                @input=${this._valueChanged}
+                placeholder="linear-gradient(180deg, #1a1a2e 0%, #0d1421 100%)"
+              ></ha-textfield>
+            </div>
+          ` : nothing}
         </div>
 
         <div class="section">
