@@ -330,6 +330,125 @@ export class WeatherCard extends LitElement {
       }
       @keyframes fog-move { 0%, 100% { transform: translateX(-20%); } 50% { transform: translateX(20%); } }
 
+      /* Sunny/Clear effect - Lens flare with multi-orb bokeh */
+      .effect-sunny {
+        background: linear-gradient(135deg,
+          rgba(255, 250, 230, 0.35) 0%,
+          rgba(255, 245, 200, 0.15) 25%,
+          transparent 50%
+        );
+      }
+
+      /* Primary sun glow */
+      .effect-sunny::before {
+        content: '';
+        position: absolute;
+        top: 3%;
+        left: 3%;
+        width: 70px;
+        height: 70px;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 245, 0.7) 0%,
+          rgba(255, 250, 200, 0.4) 35%,
+          rgba(255, 240, 180, 0.1) 60%,
+          transparent 75%
+        );
+        border-radius: 50%;
+        animation: sunny-glow-pulse 5s ease-in-out infinite;
+      }
+
+      /* Main light streak */
+      .effect-sunny .streak-main {
+        position: absolute;
+        top: 10%;
+        left: 10%;
+        width: 180px;
+        height: 2px;
+        background: linear-gradient(90deg,
+          rgba(255, 255, 255, 0.8) 0%,
+          rgba(255, 250, 220, 0.4) 40%,
+          rgba(255, 245, 200, 0.1) 80%,
+          transparent 100%
+        );
+        transform: rotate(50deg);
+        transform-origin: left center;
+        animation: sunny-streak-glow 7s ease-in-out infinite;
+      }
+
+      /* Bokeh orbs along the diagonal */
+      .effect-sunny .orb {
+        position: absolute;
+        border-radius: 50%;
+        animation: sunny-orb-float 6s ease-in-out infinite;
+      }
+
+      .effect-sunny .orb-1 {
+        top: 18%;
+        left: 22%;
+        width: 18px;
+        height: 18px;
+        background: radial-gradient(circle, 
+          rgba(255, 255, 255, 0.5) 0%, 
+          rgba(255, 245, 200, 0.2) 50%, 
+          transparent 70%
+        );
+        animation-delay: -1s;
+      }
+
+      .effect-sunny .orb-2 {
+        top: 28%;
+        left: 35%;
+        width: 12px;
+        height: 12px;
+        background: radial-gradient(circle, 
+          rgba(255, 255, 255, 0.4) 0%, 
+          rgba(255, 240, 180, 0.15) 50%, 
+          transparent 70%
+        );
+        animation-delay: -2.5s;
+      }
+
+      .effect-sunny .orb-3 {
+        top: 38%;
+        left: 48%;
+        width: 8px;
+        height: 8px;
+        background: radial-gradient(circle, 
+          rgba(255, 255, 255, 0.35) 0%, 
+          rgba(255, 235, 170, 0.1) 50%, 
+          transparent 70%
+        );
+        animation-delay: -4s;
+      }
+
+      .effect-sunny .orb-4 {
+        top: 48%;
+        left: 60%;
+        width: 6px;
+        height: 6px;
+        background: radial-gradient(circle, 
+          rgba(255, 255, 255, 0.3) 0%, 
+          transparent 70%
+        );
+        animation-delay: -3s;
+      }
+
+      @keyframes sunny-glow-pulse {
+        0%, 100% { opacity: 0.8; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.08); }
+      }
+
+      @keyframes sunny-streak-glow {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 0.9; }
+      }
+
+      @keyframes sunny-orb-float {
+        0%, 100% { opacity: 0.7; transform: scale(1) translate(0, 0); }
+        50% { opacity: 1; transform: scale(1.15) translate(2px, 2px); }
+      }
+
       /* Main grid */
       .weather-card-grid {
         display: grid;
@@ -655,6 +774,19 @@ export class WeatherCard extends LitElement {
       `;
     }
 
+    // For sunny/clear, render lens flare with bokeh orbs
+    if (effectClass === 'effect-sunny') {
+      return html`
+        <div class="weather-effects ${effectClass}">
+          <div class="streak-main"></div>
+          <div class="orb orb-1"></div>
+          <div class="orb orb-2"></div>
+          <div class="orb orb-3"></div>
+          <div class="orb orb-4"></div>
+        </div>
+      `;
+    }
+
     // For other effects, use simple container
     return html`<div class="weather-effects ${effectClass}"></div>`;
   }
@@ -664,6 +796,7 @@ export class WeatherCard extends LitElement {
     if (c.includes('rain') || c.includes('pouring')) return 'effect-rain';
     if (c.includes('snow')) return 'effect-snow';
     if (c.includes('fog')) return 'effect-fog';
+    if (c === 'sunny' || c === 'clear') return 'effect-sunny';
     return '';
   }
 
