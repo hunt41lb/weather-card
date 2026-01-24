@@ -37,6 +37,7 @@ interface WeatherCardConfig {
   show_sunrise_sunset?: boolean;
   show_alerts?: boolean;
   show_background_effects?: boolean;
+  use_dynamic_background?: boolean;
   // Tap actions
   tap_action?: ActionConfig;
   hold_action?: ActionConfig;
@@ -361,9 +362,9 @@ export class WeatherCard extends LitElement {
       /* Main light streak */
       .effect-sunny .streak-main {
         position: absolute;
-        top: 10%;
-        left: 10%;
-        width: 180px;
+        top: 0;
+        left: 0;
+        width: 200px;
         height: 2px;
         background: linear-gradient(90deg,
           rgba(255, 255, 255, 0.8) 0%,
@@ -372,7 +373,7 @@ export class WeatherCard extends LitElement {
           transparent 100%
         );
         transform: rotate(50deg);
-        transform-origin: left center;
+        transform-origin: 0% 0%;
         animation: sunny-streak-glow 7s ease-in-out infinite;
       }
 
@@ -577,6 +578,7 @@ export class WeatherCard extends LitElement {
       show_sunrise_sunset: false,
       show_alerts: false,
       show_background_effects: false,
+      use_dynamic_background: false,
       tap_action: { action: 'more-info' },
       hold_action: { action: 'none' },
       double_tap_action: { action: 'none' },
@@ -713,8 +715,13 @@ export class WeatherCard extends LitElement {
       iconRight ? 'icon-right' : ''
     ].filter(Boolean).join(' ');
 
+    // Dynamic background color based on sun state
+    const dynamicBgStyle = this._config.use_dynamic_background
+      ? `background-color: var(${isDay ? '--state-sun-above_horizon-color' : '--state-sun-below_horizon-color'}, var(--ha-card-background, var(--card-background-color)));`
+      : '';
+
     return html`
-      <ha-card style="height: ${this._config.card_height}">
+      <ha-card style="height: ${this._config.card_height}; ${dynamicBgStyle}">
         ${this._config.show_background_effects ? this._renderBackgroundEffect(condition) : nothing}
         <div class="${gridClasses}" style="--weather-icon-size: ${this._config.icon_size}px">
           ${showGreeting ? html`<div class="greeting">${greeting}</div>` : nothing}
@@ -1156,6 +1163,11 @@ export class WeatherCardEditor extends LitElement {
           <div class="field">
             <ha-formfield label="Show Background Effects">
               <ha-switch .checked=${this._config.show_background_effects === true} .configValue=${'show_background_effects'} @change=${this._valueChanged}></ha-switch>
+            </ha-formfield>
+          </div>
+          <div class="field">
+            <ha-formfield label="Dynamic Background (Day/Night)">
+              <ha-switch .checked=${this._config.use_dynamic_background === true} .configValue=${'use_dynamic_background'} @change=${this._valueChanged}></ha-switch>
             </ha-formfield>
           </div>
         </div>
