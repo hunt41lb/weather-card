@@ -717,7 +717,7 @@ export class WeatherCard extends LitElement {
 
     // Dynamic background color based on sun state
     const dynamicBgStyle = this._config.use_dynamic_background
-      ? `background-color: var(${isDay ? '--state-sun-above_horizon-color' : '--state-sun-below_horizon-color'}, var(--ha-card-background, var(--card-background-color)));`
+      ? `background-color: var(${isDay ? '--light-blue-color' : '--black-color'}, ${isDay ? '#03a9f4' : '#000000'});`
       : '';
 
     return html`
