@@ -816,7 +816,7 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
       transform: translateY(10%);
     }
   }
-`,css`
+`,n`
   /* ==========================================================================
      Fog Effect
      ========================================================================== */
