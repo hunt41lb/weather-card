@@ -67,7 +67,7 @@ export declare class WeatherCard extends LitElement {
     private _config;
     private _holdTimer?;
     private _lastTap;
-    static get styles(): import("lit").CSSResult;
+    static styles: import("lit").CSSResult[];
     setConfig(config: WeatherCardConfig): void;
     getCardSize(): number;
     getLayoutOptions(): {
