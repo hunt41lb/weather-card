@@ -171,4 +171,5 @@ export const sunnyEffectStyles = css`
       transform: scale(1.15) translate(2px, 2px);
     }
   }
+
 `;
