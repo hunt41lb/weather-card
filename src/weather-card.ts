@@ -1,4 +1,7 @@
-/* src/weather-card.ts */
+/* src/weather-card.ts 
+
+ * All Components/Styling Importing here
+*/
 
 import { LitElement, html, css, nothing, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
