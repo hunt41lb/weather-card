@@ -681,6 +681,7 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
       transform: scale(1.15) translate(2px, 2px);
     }
   }
+
 `,n`
   /* ==========================================================================
      Cloudy Effect Base
