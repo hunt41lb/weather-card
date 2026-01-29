@@ -1,3 +1,6 @@
+export declare const WEATHER_ICONS: {
+    [key: string]: string;
+};
 /**
  * Fallback icon when no matching weather icon is found
  */
