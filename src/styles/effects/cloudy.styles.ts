@@ -107,4 +107,5 @@ export const cloudyEffectStyles = css`
     from { transform: translateX(-10%); }
     to { transform: translateX(-60%); }
   }
+
 `;
