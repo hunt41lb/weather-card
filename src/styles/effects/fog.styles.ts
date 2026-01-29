@@ -6,6 +6,8 @@
  * - Slow horizontal drift animation
  */
 
+import { css } from 'lit';
+
 export const fogEffectStyles = css`
   /* ==========================================================================
      Fog Effect
