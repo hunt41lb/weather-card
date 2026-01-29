@@ -1,5 +1,7 @@
-/* weather-card/src/styles/index.ts */
+/* weather-card/src/styles/index.ts
 
+ * Index of all styles used by weather-card
+*/
 import { CSSResult } from 'lit';
 
 // Base card styles
