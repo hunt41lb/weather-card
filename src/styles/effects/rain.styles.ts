@@ -46,4 +46,5 @@ export const rainEffectStyles = css`
       transform: translateY(10%);
     }
   }
+
 `;
