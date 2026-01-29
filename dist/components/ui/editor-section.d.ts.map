@@ -1,0 +1,1 @@
+{"version":3,"file":"editor-section.d.ts","sourceRoot":"","sources":["../../../src/components/ui/editor-section.ts"],"names":[],"mappings":"AAiBA,OAAO,EAAE,UAAU,EAAa,MAAM,KAAK,CAAC;AAG5C,qBACa,aAAc,SAAQ,UAAU;IACf,KAAK,SAAM;IAEvC,MAAM,CAAC,MAAM,0BA8BX;IAEF,SAAS,CAAC,MAAM;CAUjB;AAED,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,qBAAqB;QAC7B,gBAAgB,EAAE,aAAa,CAAC;KACjC;CACF"}
