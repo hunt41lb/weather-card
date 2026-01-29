@@ -867,4 +867,4 @@ export class WeatherCardEditor extends LitElement {
 declare global { interface Window { customCards?: Array<{ type: string; name: string; description: string; preview?: boolean }>; } }
 window.customCards = window.customCards || [];
 window.customCards.push({ type: 'weather-card', name: 'Weather Card', description: 'A customizable weather card with animated icons, forecast, and tap actions', preview: true });
-console.info('%c WEATHER-CARD %c v2.0.0 ', 'color: white; background: #3498db; font-weight: bold;', 'color: #3498db; background: white; font-weight: bold;');
+console.info('%c WEATHER-CARD %c v1.0.1-u2 ', 'color: white; background: #3498db; font-weight: bold;', 'color: #3498db; background: white; font-weight: bold;');
