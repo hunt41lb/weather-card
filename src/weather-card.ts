@@ -452,6 +452,82 @@ export class WeatherCard extends LitElement {
         50% { opacity: 1; transform: scale(1.15) translate(2px, 2px); }
       }
 
+      /* Cloudy effect - Drifting cloud layers */
+      .effect-cloudy {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+      }
+
+      .effect-cloudy .cloud-layer {
+        position: absolute;
+        width: 200%;
+        height: 100%;
+        background-repeat: repeat-x;
+        background-size: 400px 100%;
+      }
+
+      .effect-cloudy .cloud-layer-1 {
+        background-image: 
+          radial-gradient(ellipse 120px 40px at 100px 60%, rgba(255,255,255,0.7) 0%, transparent 70%),
+          radial-gradient(ellipse 80px 30px at 280px 80%, rgba(255,255,255,0.5) 0%, transparent 70%),
+          radial-gradient(ellipse 100px 35px at 180px 50%, rgba(255,255,255,0.6) 0%, transparent 70%);
+        animation: cloud-drift-1 45s linear infinite;
+        opacity: 0.9;
+      }
+
+      .effect-cloudy .cloud-layer-2 {
+        background-image: 
+          radial-gradient(ellipse 90px 35px at 50px 70%, rgba(255,255,255,0.5) 0%, transparent 70%),
+          radial-gradient(ellipse 70px 25px at 200px 40%, rgba(255,255,255,0.4) 0%, transparent 70%),
+          radial-gradient(ellipse 110px 40px at 320px 65%, rgba(255,255,255,0.55) 0%, transparent 70%);
+        animation: cloud-drift-2 60s linear infinite;
+        opacity: 0.7;
+      }
+
+      .effect-cloudy .cloud-layer-3 {
+        background-image: 
+          radial-gradient(ellipse 150px 50px at 150px 55%, rgba(255,255,255,0.4) 0%, transparent 70%),
+          radial-gradient(ellipse 100px 40px at 350px 75%, rgba(255,255,255,0.35) 0%, transparent 70%);
+        animation: cloud-drift-3 80s linear infinite;
+        opacity: 0.5;
+      }
+
+      /* Night variants - darker clouds */
+      .effect-cloudy.is-night .cloud-layer-1 {
+        background-image: 
+          radial-gradient(ellipse 120px 40px at 100px 60%, rgba(60,60,90,0.6) 0%, transparent 70%),
+          radial-gradient(ellipse 80px 30px at 280px 80%, rgba(50,50,80,0.5) 0%, transparent 70%),
+          radial-gradient(ellipse 100px 35px at 180px 50%, rgba(55,55,85,0.55) 0%, transparent 70%);
+      }
+
+      .effect-cloudy.is-night .cloud-layer-2 {
+        background-image: 
+          radial-gradient(ellipse 90px 35px at 50px 70%, rgba(50,50,80,0.5) 0%, transparent 70%),
+          radial-gradient(ellipse 70px 25px at 200px 40%, rgba(45,45,75,0.4) 0%, transparent 70%),
+          radial-gradient(ellipse 110px 40px at 320px 65%, rgba(55,55,85,0.45) 0%, transparent 70%);
+      }
+
+      .effect-cloudy.is-night .cloud-layer-3 {
+        background-image: 
+          radial-gradient(ellipse 150px 50px at 150px 55%, rgba(40,40,70,0.4) 0%, transparent 70%),
+          radial-gradient(ellipse 100px 40px at 350px 75%, rgba(45,45,75,0.35) 0%, transparent 70%);
+      }
+
+      @keyframes cloud-drift-1 {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+      }
+
+      @keyframes cloud-drift-2 {
+        from { transform: translateX(-25%); }
+        to { transform: translateX(-75%); }
+      }
+
+      @keyframes cloud-drift-3 {
+        from { transform: translateX(-10%); }
+        to { transform: translateX(-60%); }
+      }
+
       /* Main grid */
       .weather-card-grid {
         display: grid;
@@ -728,7 +804,7 @@ export class WeatherCard extends LitElement {
 
     return html`
       <ha-card style="height: ${this._config.card_height}; ${dynamicBgStyle}">
-        ${this._config.show_background_effects ? this._renderBackgroundEffect(condition) : nothing}
+        ${this._config.show_background_effects ? this._renderBackgroundEffect(condition, isDay) : nothing}
         <div class="${gridClasses}" style="--weather-icon-size: ${this._config.icon_size}px">
           ${showGreeting ? html`<div class="greeting">${greeting}</div>` : nothing}
           <div class="weather-icon">
@@ -745,7 +821,7 @@ export class WeatherCard extends LitElement {
     `;
   }
 
-  private _renderBackgroundEffect(condition: string): TemplateResult {
+  private _renderBackgroundEffect(condition: string, isDay: boolean): TemplateResult {
     const effectClass = this._getEffectClass(condition);
     if (!effectClass) return html``;
 
@@ -800,6 +876,17 @@ export class WeatherCard extends LitElement {
       `;
     }
 
+    if (effectClass === 'effect-cloudy') {
+      const timeClass = isDay ? 'is-day' : 'is-night';
+      return html`
+        <div class="weather-effects ${effectClass} ${timeClass}">
+          <div class="cloud-layer cloud-layer-1"></div>
+          <div class="cloud-layer cloud-layer-2"></div>
+          <div class="cloud-layer cloud-layer-3"></div>
+        </div>
+      `;
+    }
+    
     // For other effects, use simple container
     return html`<div class="weather-effects ${effectClass}"></div>`;
   }
@@ -810,6 +897,7 @@ export class WeatherCard extends LitElement {
     if (c.includes('snow')) return 'effect-snow';
     if (c.includes('fog')) return 'effect-fog';
     if (c === 'sunny' || c === 'clear') return 'effect-sunny';
+    if (c.includes('cloudy')) return 'effect-cloudy';
     return '';
   }
 
