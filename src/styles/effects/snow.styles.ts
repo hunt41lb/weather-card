@@ -274,4 +274,5 @@ export const snowEffectStyles = css`
     animation-duration: 3.5s;
     opacity: 0.8;
   }
+
 `;
