@@ -519,6 +519,7 @@ function t(t,e,i,a){var r,s=arguments.length,n=s<3?e:null===a?a=Object.getOwnPro
     animation-duration: 3.5s;
     opacity: 0.8;
   }
+
 `,n`
   /* ==========================================================================
      Sunny Effect Base
