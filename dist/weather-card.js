@@ -1425,7 +1425,7 @@ function t(t,e,i,r){var a,n=arguments.length,s=n<3?e:null===r?r=Object.getOwnPro
           ${this._config.show_alerts?this._renderAlerts():F}
         </div>
       </ha-card>
-    `}_renderBackgroundEffect(t,e){const i=this._getEffectClass(t);if(!i)return j``;if("effect-snow"===i){const t=this._getSnowIntensity();return j`
+    `}_renderBackgroundEffect(t,e){const i=this._getEffectClass(t,e);if(!i)return j``;if("effect-snow"===i){const t=this._getSnowIntensity();return j`
         <div class="weather-effects ${i} ${t}">
           <!-- Falling snowflakes - 6 independent layers -->
           <div class="snow-container">
@@ -1471,7 +1471,17 @@ function t(t,e,i,r){var a,n=arguments.length,s=n<3?e:null===r?r=Object.getOwnPro
           <div class="cloud-layer cloud-layer-2"></div>
           <div class="cloud-layer cloud-layer-3"></div>
         </div>
-      `}return j`<div class="weather-effects ${i}"></div>`}_getEffectClass(t){const e=t?.toLowerCase()||"";return e.includes("rain")||e.includes("pouring")?"effect-rain":e.includes("snow")?"effect-snow":e.includes("fog")?"effect-fog":"sunny"===e||"clear"===e?"effect-sunny":e.includes("cloudy")?"effect-cloudy":""}_getSnowIntensity(){const t=this._config.weather_entity?this.hass.states[this._config.weather_entity]:void 0;if(!t)return"";const e=Number(t.attributes?.precipitation)||0;return e>=4?"intensity-heavy":e<1?"intensity-light":""}_renderWeatherIcon(t,e){if(!t)return j`<span class="unavailable">No weather entity</span>`;const i=function(t,e){const i=t?.toLowerCase().replace(/-/g,"")||"cloudy",r=e?"day":"night",a=`${i}_${r}`;if(wt[a])return wt[a];const n=`${t}_${r}`;if(wt[n])return wt[n];const s=_t[i];if(s){const t=`${s}_${r}`;if(wt[t])return wt[t]}const o=`cloudy_${r}`;return wt[o]?wt[o]:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="32" y="40" text-anchor="middle" font-size="24">?</text></svg>'}(t,e);return j`${bt(i)}`}_renderSunTimes(){const t=this._config.sun_entity?this.hass.states[this._config.sun_entity]:void 0;if(!t)return j``;const e=t.attributes.next_rising,i=t.attributes.next_setting,r=t=>{if(!t)return"--:--";return new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})};return j`
+      `}return"effect-clear-night"===i?j`
+        <div class="weather-effects ${i}">
+          <div class="stars-static"></div>
+          <div class="twinkle-star twinkle-star-1"></div>
+          <div class="twinkle-star twinkle-star-2"></div>
+          <div class="twinkle-star twinkle-star-3"></div>
+          <div class="twinkle-star twinkle-star-4"></div>
+          <div class="twinkle-star twinkle-star-5"></div>
+          <div class="twinkle-star twinkle-star-6"></div>
+        </div>
+      `:j`<div class="weather-effects ${i}"></div>`}_getEffectClass(t,e){const i=t?.toLowerCase()||"";return i.includes("rain")||i.includes("pouring")?"effect-rain":i.includes("snow")?"effect-snow":i.includes("fog")?"effect-fog":"sunny"===i||"clear"===i&&e?"effect-sunny":"clear"!==i&&"clear-night"!==i||e?i.includes("cloudy")?"effect-cloudy":"":"effect-clear-night"}_getSnowIntensity(){const t=this._config.weather_entity?this.hass.states[this._config.weather_entity]:void 0;if(!t)return"";const e=Number(t.attributes?.precipitation)||0;return e>=4?"intensity-heavy":e<1?"intensity-light":""}_renderWeatherIcon(t,e){if(!t)return j`<span class="unavailable">No weather entity</span>`;const i=function(t,e){const i=t?.toLowerCase().replace(/-/g,"")||"cloudy",r=e?"day":"night",a=`${i}_${r}`;if(wt[a])return wt[a];const n=`${t}_${r}`;if(wt[n])return wt[n];const s=_t[i];if(s){const t=`${s}_${r}`;if(wt[t])return wt[t]}const o=`cloudy_${r}`;return wt[o]?wt[o]:'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><text x="32" y="40" text-anchor="middle" font-size="24">?</text></svg>'}(t,e);return j`${bt(i)}`}_renderSunTimes(){const t=this._config.sun_entity?this.hass.states[this._config.sun_entity]:void 0;if(!t)return j``;const e=t.attributes.next_rising,i=t.attributes.next_setting,r=t=>{if(!t)return"--:--";return new Date(t).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})};return j`
       <div class="sun-times">
         <div class="sun-time">
           <span class="sun-icon">🌅</span>
