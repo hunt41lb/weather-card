@@ -302,18 +302,56 @@ export class WeatherCard extends LitElement {
       `;
     }
 
+    // Rain effect
+    if (effectClass === 'effect-rain') {
+      const timeClass = isDay ? 'is-day' : 'is-night';
+      return html`
+        <div class="weather-effects ${effectClass} ${timeClass}">
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+          <div class="rain"><div class="drop"></div><div class="splash"></div></div>
+        </div>
+      `;
+    }
+
     // For other effects, use simple container
     return html`<div class="weather-effects ${effectClass}"></div>`;
   }
 
   private _getEffectClass(condition: string, isDay: boolean): string {
     const c = condition?.toLowerCase() || '';
+
+    // Snow takes priority (including snowy-rainy)
+    if (c.includes('snow') || c.includes('hail')) return 'effect-snow';
+
+    // Rain conditions
     if (c.includes('rain') || c.includes('pouring')) return 'effect-rain';
-    if (c.includes('snow')) return 'effect-snow';
-    if (c.includes('fog')) return 'effect-fog';
-    if (c === 'sunny' || (c === 'clear' && isDay)) return 'effect-sunny';
-    if ((c === 'clear' || c === 'clear-night') && !isDay) return 'effect-clear-night';
-    if (c.includes('cloudy')) return 'effect-cloudy';
+
+    // Cloudy/Fog conditions
+    if (c.includes('cloudy') || c.includes('fog')) return 'effect-cloudy';
+
+    // Clear/Sunny conditions
+    if (c === 'sunny' || c === 'clear' || c === 'clear-night' || c.includes('windy') || c === 'exceptional') {
+      return isDay ? 'effect-sunny' : 'effect-clear-night';
+    }
+
     return '';
   }
 
