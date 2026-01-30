@@ -15,6 +15,7 @@ import {
   cloudyEffectStyles,
   rainEffectStyles,
   fogEffectStyles,
+  clearNightStyles,
 } from './effects';
 
 /**
@@ -29,6 +30,7 @@ export const weatherCardStyles: CSSResult[] = [
   cloudyEffectStyles,
   rainEffectStyles,
   fogEffectStyles,
+  clearNightStyles,
 ];
 
 // Re-export individual styles for selective importing if needed
