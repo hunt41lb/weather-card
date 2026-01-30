@@ -67,10 +67,10 @@ export class WeatherCard extends LitElement {
       sun_entity: 'sun.sun',
       primary_entity: 'weather.forecast_home',
       primary_attribute: 'temperature',
-      primary_unit: '°F',
+      primary_unit: 'Â°F',
       secondary_entity: 'weather.forecast_home',
       secondary_attribute: 'apparent_temperature',
-      secondary_unit: '°F',
+      secondary_unit: 'Â°F',
       secondary_label: 'Feels Like:',
       show_greeting: true,
       icon_size: 100,
@@ -267,9 +267,22 @@ export class WeatherCard extends LitElement {
       const timeClass = isDay ? 'is-day' : 'is-night';
       return html`
         <div class="weather-effects ${effectClass} ${timeClass}">
-          <div class="cloud-layer cloud-layer-1"></div>
-          <div class="cloud-layer cloud-layer-2"></div>
-          <div class="cloud-layer cloud-layer-3"></div>
+          <div class="cloud cloud-1">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="cloud cloud-2">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="cloud cloud-3">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span>
+          </div>
+          <div class="cloud cloud-4">
+            <span></span><span></span><span></span><span></span>
+            <span></span><span></span><span></span>
+          </div>
         </div>
       `;
     }
@@ -337,11 +350,11 @@ export class WeatherCard extends LitElement {
     return html`
       <div class="sun-times">
         <div class="sun-time">
-          <span class="sun-icon">🌅</span>
+          <span class="sun-icon">ðŸŒ…</span>
           <span>${formatTime(sunrise)}</span>
         </div>
         <div class="sun-time">
-          <span class="sun-icon">🌇</span>
+          <span class="sun-icon">ðŸŒ‡</span>
           <span>${formatTime(sunset)}</span>
         </div>
       </div>
@@ -356,14 +369,14 @@ export class WeatherCard extends LitElement {
     if (!forecast || forecast.length === 0) return html``;
 
     const days = forecast.slice(0, this._config.forecast_days || 5);
-    const unit = this._config.primary_unit || '°';
+    const unit = this._config.primary_unit || 'Â°';
 
     return html`
       <div class="forecast">
         ${days.map(day => html`
           <div class="forecast-day">
             <div class="forecast-day-name">${getDayName(day.datetime)}</div>
-            <div class="forecast-icon">${MINI_ICONS[day.condition] || '❓'}</div>
+            <div class="forecast-icon">${MINI_ICONS[day.condition] || 'â“'}</div>
             <div class="forecast-temps">
               <span class="forecast-high">${Math.round(day.temperature || 0)}${unit}</span>
               ${day.templow !== undefined ? html`<span class="forecast-low">${Math.round(day.templow)}${unit}</span>` : nothing}
@@ -387,7 +400,7 @@ export class WeatherCard extends LitElement {
     return html`
       <div class="alerts">
         <div class="alert">
-          <span class="alert-icon">⚠️</span>
+          <span class="alert-icon">âš ï¸</span>
           <div class="alert-text">
             <div class="alert-title">${alert.title || 'Weather Alert'}</div>
             ${alert.description ? html`<div class="alert-description">${alert.description}</div>` : nothing}
