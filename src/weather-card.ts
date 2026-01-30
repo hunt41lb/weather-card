@@ -201,7 +201,7 @@ export class WeatherCard extends LitElement {
   }
 
   private _renderBackgroundEffect(condition: string, isDay: boolean): TemplateResult {
-    const effectClass = this._getEffectClass(condition);
+    const effectClass = this._getEffectClass(condition, isDay);
     if (!effectClass) return html``;
 
     // For snow, render the enhanced effect with snowbank
@@ -266,16 +266,32 @@ export class WeatherCard extends LitElement {
       `;
     }
 
+    // For clear night, render static stars with twinkling stars
+    if (effectClass === 'effect-clear-night') {
+      return html`
+        <div class="weather-effects ${effectClass}">
+          <div class="stars-static"></div>
+          <div class="twinkle-star twinkle-star-1"></div>
+          <div class="twinkle-star twinkle-star-2"></div>
+          <div class="twinkle-star twinkle-star-3"></div>
+          <div class="twinkle-star twinkle-star-4"></div>
+          <div class="twinkle-star twinkle-star-5"></div>
+          <div class="twinkle-star twinkle-star-6"></div>
+        </div>
+      `;
+    }
+
     // For other effects, use simple container
     return html`<div class="weather-effects ${effectClass}"></div>`;
   }
 
-  private _getEffectClass(condition: string): string {
+  private _getEffectClass(condition: string, isDay: boolean): string {
     const c = condition?.toLowerCase() || '';
     if (c.includes('rain') || c.includes('pouring')) return 'effect-rain';
     if (c.includes('snow')) return 'effect-snow';
     if (c.includes('fog')) return 'effect-fog';
-    if (c === 'sunny' || c === 'clear') return 'effect-sunny';
+    if (c === 'sunny' || (c === 'clear' && isDay)) return 'effect-sunny';
+    if ((c === 'clear' || c === 'clear-night') && !isDay) return 'effect-clear-night';
     if (c.includes('cloudy')) return 'effect-cloudy';
     return '';
   }
