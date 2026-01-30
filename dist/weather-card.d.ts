@@ -33,11 +33,6 @@ export declare class WeatherCard extends LitElement {
     private _renderSunTimes;
     private _renderForecast;
     private _renderAlerts;
-    private _getGreeting;
-    private _getPrimaryValue;
-    private _getSecondaryValue;
-    private _getDescription;
-    private _formatCondition;
 }
 declare global {
     interface Window {
