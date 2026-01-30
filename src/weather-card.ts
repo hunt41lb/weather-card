@@ -12,6 +12,14 @@ import { weatherCardStyles } from './styles';
 import { getWeatherIcon, MINI_ICONS } from './components/icons';
 import './components/editor';
 import type { HomeAssistant, WeatherCardConfig, ActionConfig, ForecastDay } from './types';
+import {
+  formatTime,
+  getDayName,
+  getGreeting,
+  getPrimaryValue,
+  getSecondaryValue,
+  getDescription,
+} from './utils';
 
 @customElement('weather-card')
 export class WeatherCard extends LitElement {
@@ -156,10 +164,10 @@ export class WeatherCard extends LitElement {
 
   protected render() {
     if (!this._config || !this.hass) return html``;
-    const greeting = this._getGreeting();
-    const primary = this._getPrimaryValue();
-    const secondary = this._getSecondaryValue();
-    const description = this._getDescription();
+    const greeting = getGreeting(this._config, this.hass);
+    const primary = getPrimaryValue(this._config, this.hass);
+    const secondary = getSecondaryValue(this._config, this.hass);
+    const description = getDescription(this._config, this.hass);
     const showGreeting = this._config.show_greeting !== false;
     const iconRight = this._config.icon_position === 'right';
 
@@ -326,12 +334,6 @@ export class WeatherCard extends LitElement {
     const sunrise = sunEntity.attributes.next_rising as string;
     const sunset = sunEntity.attributes.next_setting as string;
 
-    const formatTime = (isoString: string): string => {
-      if (!isoString) return '--:--';
-      const date = new Date(isoString);
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    };
-
     return html`
       <div class="sun-times">
         <div class="sun-time">
@@ -355,17 +357,6 @@ export class WeatherCard extends LitElement {
 
     const days = forecast.slice(0, this._config.forecast_days || 5);
     const unit = this._config.primary_unit || '°';
-
-    const getDayName = (dateStr: string): string => {
-      const date = new Date(dateStr);
-      const today = new Date();
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      if (date.toDateString() === today.toDateString()) return 'Today';
-      if (date.toDateString() === tomorrow.toDateString()) return 'Tmrw';
-      return date.toLocaleDateString([], { weekday: 'short' });
-    };
 
     return html`
       <div class="forecast">
@@ -405,64 +396,9 @@ export class WeatherCard extends LitElement {
       </div>
     `;
   }
-
-  private _getGreeting(): string {
-    if (this._config.greeting_name) return `Hello, ${this._config.greeting_name}`;
-    const userName = this.hass?.user?.name;
-    if (userName) return `Hello, ${userName.split(' ')[0]}`;
-    return 'Hello';
-  }
-
-  private _getPrimaryValue(): string {
-    const config = this._config;
-    if (!config.primary_entity) return '--';
-    const entity = this.hass.states[config.primary_entity];
-    if (!entity) return '--';
-    let value: string | number | unknown;
-    if (config.primary_attribute) { value = entity.attributes[config.primary_attribute]; } else { value = entity.state; }
-    if (value === undefined || value === null || value === 'unknown' || value === 'unavailable') return '--';
-    const unit = config.primary_unit || '';
-    return `${value}${unit}`;
-  }
-
-  private _getSecondaryValue(): string {
-    const config = this._config;
-    if (!config.secondary_entity) return '';
-    const entity = this.hass.states[config.secondary_entity];
-    if (!entity) return '';
-    let value: string | number | unknown;
-    if (config.secondary_attribute) { value = entity.attributes[config.secondary_attribute]; } else { value = entity.state; }
-    if (value === undefined || value === null || value === 'unknown' || value === 'unavailable') return '';
-    const label = config.secondary_label || '';
-    const unit = config.secondary_unit || '';
-    return `${label} ${value}${unit}`.trim();
-  }
-
-  private _getDescription(): string {
-    const config = this._config;
-    if (!config.description_entity) {
-      if (config.weather_entity) {
-        const entity = this.hass.states[config.weather_entity];
-        if (entity) return this._formatCondition(entity.state);
-      }
-      return '';
-    }
-    const entity = this.hass.states[config.description_entity];
-    if (!entity) return '';
-    if (config.description_attribute) {
-      const value = entity.attributes[config.description_attribute];
-      return value !== undefined && value !== null ? String(value) : '';
-    }
-    return this._formatCondition(entity.state);
-  }
-
-  private _formatCondition(condition: string): string {
-    const conditionMap: { [key: string]: string } = { 'partlycloudy': 'Partly Cloudy', 'mostlycloudy': 'Mostly Cloudy', 'clear': 'Clear', 'clear-night': 'Clear', 'cloudy': 'Cloudy', 'rainy': 'Rain', 'pouring': 'Heavy Rain', 'snowy': 'Snow', 'snowy-rainy': 'Sleet', 'sunny': 'Sunny', 'windy': 'Windy', 'windy-variant': 'Windy', 'foggy': 'Foggy', 'fog': 'Fog', 'hail': 'Hail', 'lightning': 'Lightning', 'lightning-rainy': 'Thunderstorm', 'exceptional': 'Exceptional' };
-    return conditionMap[condition.toLowerCase()] || condition.charAt(0).toUpperCase() + condition.slice(1).replace(/-/g, ' ');
-  }
 }
 
 declare global { interface Window { customCards?: Array<{ type: string; name: string; description: string; preview?: boolean }>; } }
 window.customCards = window.customCards || [];
 window.customCards.push({ type: 'weather-card', name: 'Weather Card', description: 'A customizable weather card with animated icons, forecast, and tap actions', preview: true });
-console.info('%c WEATHER-CARD %c v1.0.1-u3 ', 'color: white; background: #3498db; font-weight: bold;', 'color: #3498db; background: white; font-weight: bold;');
+console.info('%c WEATHER-CARD %c v1.0.1-u5 ', 'color: white; background: #3498db; font-weight: bold;', 'color: #3498db; background: white; font-weight: bold;');
