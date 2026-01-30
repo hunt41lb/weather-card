@@ -5,7 +5,7 @@
  * - Organic, textured clouds with multiple overlapping puffs
  * - Horizontal drift animation (left to right)
  * - Multiple cloud clusters at different positions and depths
- * - Varying blur levels for realistic soft edges
+ * - Gray color palette for better text readability
  * - Day and night color variants
  */
 
@@ -36,10 +36,10 @@ export const cloudyEffectStyles = css`
     align-items: center;
   }
 
-  /* Base cloud puff - will be customized per layer */
+  /* Base cloud puff - gray tones for readability */
   .effect-cloudy .cloud span {
     position: absolute;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(165, 167, 168, 0.85);
     border-radius: 50%;
     opacity: 0;
     animation: cloud-drift 20s linear infinite;
@@ -56,6 +56,7 @@ export const cloudyEffectStyles = css`
 
   .effect-cloudy .cloud-1 span {
     filter: blur(8px);
+    background: rgba(165, 167, 168, 0.9);
   }
 
   /* Core puffs - main body */
@@ -64,11 +65,11 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-1 span:nth-child(3) { width: 70px; height: 45px; top: 5px; left: 70px; animation-delay: 0.4s; }
   .effect-cloudy .cloud-1 span:nth-child(4) { width: 55px; height: 35px; top: 15px; left: 110px; animation-delay: 0.6s; }
   
-  /* Texture puffs - add depth */
-  .effect-cloudy .cloud-1 span:nth-child(5) { width: 40px; height: 30px; top: -5px; left: 50px; opacity: 0.6; filter: blur(10px); animation-delay: 0.3s; }
-  .effect-cloudy .cloud-1 span:nth-child(6) { width: 35px; height: 25px; top: 20px; left: 40px; opacity: 0.5; filter: blur(12px); animation-delay: 0.5s; }
-  .effect-cloudy .cloud-1 span:nth-child(7) { width: 50px; height: 35px; top: -8px; left: 85px; opacity: 0.7; filter: blur(9px); animation-delay: 0.7s; }
-  .effect-cloudy .cloud-1 span:nth-child(8) { width: 30px; height: 22px; top: 25px; left: 95px; opacity: 0.4; filter: blur(14px); animation-delay: 0.8s; }
+  /* Texture puffs - add depth with darker gray */
+  .effect-cloudy .cloud-1 span:nth-child(5) { width: 40px; height: 30px; top: -5px; left: 50px; filter: blur(10px); animation-delay: 0.3s; background: rgba(146, 149, 150, 0.7); }
+  .effect-cloudy .cloud-1 span:nth-child(6) { width: 35px; height: 25px; top: 20px; left: 40px; filter: blur(12px); animation-delay: 0.5s; background: rgba(146, 149, 150, 0.6); }
+  .effect-cloudy .cloud-1 span:nth-child(7) { width: 50px; height: 35px; top: -8px; left: 85px; filter: blur(9px); animation-delay: 0.7s; background: rgba(156, 158, 159, 0.75); }
+  .effect-cloudy .cloud-1 span:nth-child(8) { width: 30px; height: 22px; top: 25px; left: 95px; filter: blur(14px); animation-delay: 0.8s; background: rgba(146, 149, 150, 0.5); }
 
   /* ==========================================================================
      Cloud 2 - Medium mid-level cloud
@@ -82,6 +83,7 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-2 span {
     filter: blur(7px);
     animation-duration: 25s;
+    background: rgba(160, 162, 163, 0.85);
   }
 
   /* Core puffs */
@@ -91,10 +93,10 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-2 span:nth-child(4) { width: 45px; height: 30px; top: 12px; left: 90px; animation-delay: 6.6s; }
   
   /* Texture puffs */
-  .effect-cloudy .cloud-2 span:nth-child(5) { width: 35px; height: 25px; top: -3px; left: 40px; opacity: 0.6; filter: blur(10px); animation-delay: 6.3s; }
-  .effect-cloudy .cloud-2 span:nth-child(6) { width: 28px; height: 20px; top: 18px; left: 55px; opacity: 0.5; filter: blur(11px); animation-delay: 6.5s; }
-  .effect-cloudy .cloud-2 span:nth-child(7) { width: 40px; height: 28px; top: -5px; left: 70px; opacity: 0.6; filter: blur(9px); animation-delay: 6.7s; }
-  .effect-cloudy .cloud-2 span:nth-child(8) { width: 32px; height: 22px; top: 20px; left: 30px; opacity: 0.4; filter: blur(13px); animation-delay: 6.8s; }
+  .effect-cloudy .cloud-2 span:nth-child(5) { width: 35px; height: 25px; top: -3px; left: 40px; filter: blur(10px); animation-delay: 6.3s; background: rgba(146, 149, 150, 0.65); }
+  .effect-cloudy .cloud-2 span:nth-child(6) { width: 28px; height: 20px; top: 18px; left: 55px; filter: blur(11px); animation-delay: 6.5s; background: rgba(146, 149, 150, 0.55); }
+  .effect-cloudy .cloud-2 span:nth-child(7) { width: 40px; height: 28px; top: -5px; left: 70px; filter: blur(9px); animation-delay: 6.7s; background: rgba(156, 158, 159, 0.7); }
+  .effect-cloudy .cloud-2 span:nth-child(8) { width: 32px; height: 22px; top: 20px; left: 30px; filter: blur(13px); animation-delay: 6.8s; background: rgba(146, 149, 150, 0.5); }
 
   /* ==========================================================================
      Cloud 3 - Small background cloud (lower)
@@ -108,7 +110,7 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-3 span {
     filter: blur(6px);
     animation-duration: 30s;
-    opacity: 0.7;
+    background: rgba(155, 157, 158, 0.8);
   }
 
   /* Core puffs */
@@ -118,8 +120,8 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-3 span:nth-child(4) { width: 35px; height: 24px; top: 8px; left: 75px; animation-delay: 12.6s; }
   
   /* Texture puffs */
-  .effect-cloudy .cloud-3 span:nth-child(5) { width: 25px; height: 18px; top: -2px; left: 35px; opacity: 0.5; filter: blur(8px); animation-delay: 12.3s; }
-  .effect-cloudy .cloud-3 span:nth-child(6) { width: 30px; height: 20px; top: 12px; left: 45px; opacity: 0.4; filter: blur(10px); animation-delay: 12.5s; }
+  .effect-cloudy .cloud-3 span:nth-child(5) { width: 25px; height: 18px; top: -2px; left: 35px; filter: blur(8px); animation-delay: 12.3s; background: rgba(146, 149, 150, 0.6); }
+  .effect-cloudy .cloud-3 span:nth-child(6) { width: 30px; height: 20px; top: 12px; left: 45px; filter: blur(10px); animation-delay: 12.5s; background: rgba(146, 149, 150, 0.5); }
 
   /* ==========================================================================
      Cloud 4 - Wispy accent cloud
@@ -133,6 +135,7 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-4 span {
     filter: blur(9px);
     animation-duration: 22s;
+    background: rgba(162, 164, 165, 0.85);
   }
 
   /* Core puffs - more spread out for wispy look */
@@ -142,9 +145,9 @@ export const cloudyEffectStyles = css`
   .effect-cloudy .cloud-4 span:nth-child(4) { width: 40px; height: 26px; top: 3px; left: 110px; animation-delay: 3.9s; }
   
   /* Texture puffs - extra wispy */
-  .effect-cloudy .cloud-4 span:nth-child(5) { width: 30px; height: 20px; top: -8px; left: 55px; opacity: 0.5; filter: blur(12px); animation-delay: 3.4s; }
-  .effect-cloudy .cloud-4 span:nth-child(6) { width: 25px; height: 18px; top: 15px; left: 90px; opacity: 0.4; filter: blur(14px); animation-delay: 3.7s; }
-  .effect-cloudy .cloud-4 span:nth-child(7) { width: 35px; height: 24px; top: -5px; left: 95px; opacity: 0.6; filter: blur(11px); animation-delay: 4.0s; }
+  .effect-cloudy .cloud-4 span:nth-child(5) { width: 30px; height: 20px; top: -8px; left: 55px; filter: blur(12px); animation-delay: 3.4s; background: rgba(146, 149, 150, 0.55); }
+  .effect-cloudy .cloud-4 span:nth-child(6) { width: 25px; height: 18px; top: 15px; left: 90px; filter: blur(14px); animation-delay: 3.7s; background: rgba(146, 149, 150, 0.45); }
+  .effect-cloudy .cloud-4 span:nth-child(7) { width: 35px; height: 24px; top: -5px; left: 95px; filter: blur(11px); animation-delay: 4.0s; background: rgba(156, 158, 159, 0.65); }
 
   /* ==========================================================================
      Cloud Drift Animation - Horizontal movement with scale/fade
@@ -178,34 +181,52 @@ export const cloudyEffectStyles = css`
   }
 
   /* ==========================================================================
-     Night Variants - Darker, muted cloud colors with subtle blue tint
+     Night Variants - Darker gray-blue tones
      ========================================================================== */
 
   .effect-cloudy.is-night .cloud span {
-    background: rgba(70, 75, 100, 0.75);
+    background: rgba(70, 75, 85, 0.8);
   }
 
   /* Slightly different shades per cloud for depth */
   .effect-cloudy.is-night .cloud-1 span {
-    background: rgba(75, 80, 110, 0.8);
+    background: rgba(75, 80, 90, 0.85);
   }
 
   .effect-cloudy.is-night .cloud-1 span:nth-child(5),
   .effect-cloudy.is-night .cloud-1 span:nth-child(6),
   .effect-cloudy.is-night .cloud-1 span:nth-child(7),
   .effect-cloudy.is-night .cloud-1 span:nth-child(8) {
-    background: rgba(65, 70, 100, 0.6);
+    background: rgba(60, 65, 75, 0.65);
   }
 
   .effect-cloudy.is-night .cloud-2 span {
-    background: rgba(65, 70, 95, 0.7);
+    background: rgba(65, 70, 80, 0.75);
+  }
+
+  .effect-cloudy.is-night .cloud-2 span:nth-child(5),
+  .effect-cloudy.is-night .cloud-2 span:nth-child(6),
+  .effect-cloudy.is-night .cloud-2 span:nth-child(7),
+  .effect-cloudy.is-night .cloud-2 span:nth-child(8) {
+    background: rgba(55, 60, 70, 0.6);
   }
 
   .effect-cloudy.is-night .cloud-3 span {
-    background: rgba(55, 60, 85, 0.65);
+    background: rgba(55, 60, 70, 0.7);
+  }
+
+  .effect-cloudy.is-night .cloud-3 span:nth-child(5),
+  .effect-cloudy.is-night .cloud-3 span:nth-child(6) {
+    background: rgba(50, 55, 65, 0.55);
   }
 
   .effect-cloudy.is-night .cloud-4 span {
-    background: rgba(60, 65, 90, 0.7);
+    background: rgba(60, 65, 75, 0.75);
+  }
+
+  .effect-cloudy.is-night .cloud-4 span:nth-child(5),
+  .effect-cloudy.is-night .cloud-4 span:nth-child(6),
+  .effect-cloudy.is-night .cloud-4 span:nth-child(7) {
+    background: rgba(50, 55, 65, 0.55);
   }
 `;
